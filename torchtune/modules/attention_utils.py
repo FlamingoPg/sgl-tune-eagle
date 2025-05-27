@@ -23,6 +23,7 @@ if _SUPPORTS_FLEX_ATTENTION:
     )
 
     def compile_flex_attention():
+        return flex_attention
         try:
             return torch.compile(flex_attention, dynamic=False)
         except Exception as e:

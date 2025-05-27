@@ -398,7 +398,7 @@ class TransformerDecoder(nn.Module):
         self.head_dim = head_dim
         self.causal_mask = None
         self.num_output_chunks = 0
-        self.skip_output_layer = False
+        self.skip_output_layer = True
 
         # attributes for KV caches during inference
         self.encoder_max_cache_seq_len = None
@@ -570,6 +570,7 @@ class TransformerDecoder(nn.Module):
                 raise ValueError(
                     "KV-caches are setup for inference mode, input positions must be provided!"
                 )
+        
 
     def forward(
         self,

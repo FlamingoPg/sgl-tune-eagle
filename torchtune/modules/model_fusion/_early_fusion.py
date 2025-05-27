@@ -76,6 +76,7 @@ class EarlyFusionModel(nn.Module):
         decoder: TransformerDecoder,
         encoders: dict[str, nn.Module],
         encoder_tokens: dict[str, int],
+        draft: Optional[nn.Module] = None,
         decoder_trainable: bool = False,
         encoders_trainable: Union[bool, dict[str, bool]] = False,
         fusion_trainable: bool = True,
@@ -97,6 +98,7 @@ class EarlyFusionModel(nn.Module):
             if isinstance(encoders_trainable, bool)
             else encoders_trainable
         )
+        self.draft = draft
 
         trainable_params = set()
         for encoder, trainable in self.encoders_trainable.items():
@@ -113,6 +115,9 @@ class EarlyFusionModel(nn.Module):
             trainable_params |= set(get_fusion_params(self))
         else:
             trainable_params -= set(get_fusion_params(self))
+        trainable_params |= {
+            f"draft.{n}" for n, p in self.draft.named_parameters()
+        }
 
         set_trainable_params(self, trainable_params)
 
@@ -287,4 +292,11 @@ class EarlyFusionModel(nn.Module):
         output = self.decoder(
             tokens=None, mask=mask, input_pos=input_pos, input_embeds=fused_embeds
         )
-        return output
+        
+        output_backbone = output[0]
+        output = [output[1], output[2], output[3]]
+        
+        # TODO(yinfan98): need a new draft model mask here
+        output = self.draft(tokens=None, mask=mask, input_pos=input_pos, input_embeds=fused_embeds, input_hidden=output) if self.draft is not None else output
+        
+        return (output, output_backbone) 

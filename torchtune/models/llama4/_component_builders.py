@@ -4,8 +4,10 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
+import torch
+
 from functools import partial
-from typing import Optional
+from typing import Optional, Union, List
 
 from torch import nn
 from torchtune.models.clip._component_builders import (
@@ -50,6 +52,335 @@ can take either nn.Linear or nn.LoRALinear for ``q_proj``.
 - Builder functions expose a set of configurable params which keep the constructors of
 the building blocks simple.
 """
+
+
+def llama4_draft_decoder(
+    *,
+    vocab_size: int,
+    num_layers: int,
+    num_heads: int,
+    num_kv_heads: int,
+    embed_dim: int,
+    hidden_dim: int,
+    max_seq_len: int,
+    attn_dropout: float = 0.0,
+    rope_base: int = 500_000,
+    norm_eps: float = 1e-5,
+    num_experts: int = 16,
+    experts_per_token: int = 1,
+    use_shared_expert: bool = True,
+    use_qk_norm: bool = True,
+    moe_every_n_layers: Optional[int] = None,
+    mlp_hidden_dim: Optional[int] = None,
+    skip_rope_interval: Optional[int] = None,
+    attention_chunk_size: Optional[int] = None,
+    use_scaled_rope: bool = False,
+    rope_scale_factor: Optional[float] = 16.0,
+    rope_low_freq_factor: Optional[float] = 1.0,
+    rope_high_freq_factor: Optional[float] = 1.0,
+    old_context_len: Optional[int] = 8192,
+) -> TransformerDecoder:
+
+    if skip_rope_interval is not None and attention_chunk_size is None:
+        raise ValueError(
+            "Must pass local_chunk_size when enabling local chunked attention"
+        )
+    head_dim = embed_dim // num_heads
+    num_kv_heads = num_kv_heads if num_kv_heads else num_heads
+
+    if use_scaled_rope:
+        rope = Llama4ScaledRoPE(
+            dim=head_dim,
+            max_seq_len=max_seq_len,
+            base=rope_base,
+            scale_factor=rope_scale_factor,
+            low_freq_factor=rope_low_freq_factor,
+            high_freq_factor=rope_high_freq_factor,
+            old_context_len=old_context_len,
+        )
+    else:
+        rope = RotaryPositionalEmbeddings(
+            dim=head_dim, max_seq_len=max_seq_len, base=rope_base
+        )
+    layers = []
+    for i in range(num_layers):
+
+        mask_mod = None
+        if skip_rope_interval is not None and (i + 1) % skip_rope_interval != 0:
+            mask_mod = partial(
+                get_chunked_attention_mask, chunk_size=attention_chunk_size
+            )
+            # Note: this is the value in llama-models, which doesn't match the config
+            pos_embeddings = rope
+
+            q_norm = partial(rms_norm, eps=norm_eps) if use_qk_norm else None
+            k_norm = partial(rms_norm, eps=norm_eps) if use_qk_norm else None
+        else:
+            pos_embeddings, q_norm, k_norm = None, None, None
+
+        self_attn = MultiHeadAttention(
+            embed_dim=embed_dim,
+            num_heads=num_heads,
+            num_kv_heads=num_kv_heads,
+            head_dim=head_dim,
+            q_proj=nn.Linear(embed_dim, num_heads * head_dim, bias=False),
+            k_proj=nn.Linear(embed_dim, num_kv_heads * head_dim, bias=False),
+            v_proj=nn.Linear(embed_dim, num_kv_heads * head_dim, bias=False),
+            output_proj=nn.Linear(embed_dim, embed_dim, bias=False),
+            pos_embeddings=pos_embeddings,
+            q_norm=q_norm,
+            k_norm=k_norm,
+            max_seq_len=max_seq_len,
+            attn_dropout=attn_dropout,
+        )
+        
+        mlp_layer = llama4_moe(
+            dim=embed_dim,
+            hidden_dim=hidden_dim,
+            num_experts=num_experts,
+            experts_per_token=experts_per_token,
+            use_shared_expert=use_shared_expert,
+        )
+
+        layer = TransformerSelfAttentionLayer(
+            attn=self_attn,
+            mlp=mlp_layer,
+            sa_norm=RMSNorm(dim=embed_dim, eps=norm_eps),
+            mlp_norm=RMSNorm(dim=embed_dim, eps=norm_eps),
+            mask_mod=mask_mod,
+        )
+        layers.append(layer)
+    layers = nn.ModuleList(layers)
+
+    tok_embeddings = nn.Identity()
+    output_proj = nn.Identity
+    
+    return TransformerDecoder(
+        tok_embeddings=tok_embeddings,
+        layers=layers,
+        max_seq_len=max_seq_len,
+        num_heads=num_heads,
+        head_dim=head_dim,
+        norm=RMSNorm(dim=embed_dim, eps=norm_eps),
+        output=output_proj
+    )
+
+
+class EAGLE3DraftModel(nn.Module):
+    def __init__(
+        self,
+        vocab_size,
+        num_layers,
+        num_heads,
+        num_kv_heads,
+        embed_dim,
+        intermediate_dim,
+        max_seq_len,
+        rope_base,
+        norm_eps,
+        num_feature_layers,
+        dropout
+    ):
+        super().__init__()
+
+        self.vocab_size = vocab_size
+        self.num_layers = num_layers
+        self.num_heads = num_heads
+        self.num_kv_heads = num_kv_heads
+        self.embed_dim = embed_dim
+        self.intermediate_dim = intermediate_dim
+        self.max_seq_len = max_seq_len
+        self.rope_base = rope_base
+        self.norm_eps = norm_eps
+        self.num_feature_layers = num_feature_layers
+        self.dropout = dropout
+
+        # 1. 多层特征融合模块
+        self.feature_fusion = nn.Linear(
+            self.num_feature_layers * self.embed_dim,  # 融合多层特征
+            self.embed_dim
+        )
+
+        # 2. 输入投影层（特征 + token embedding）
+        self.input_projection = nn.Linear(
+            self.embed_dim + self.embed_dim,  # fused_features + token_embedding
+            self.embed_dim
+        )
+
+        # 3. Draft decoder（核心transformer层）
+        self.draft_decoder = llama4_draft_decoder(
+            vocab_size=self.vocab_size,
+            num_layers=self.num_layers,
+            num_heads=self.num_heads,
+            num_kv_heads=self.num_kv_heads,
+            embed_dim=self.embed_dim,
+            hidden_dim=self.intermediate_dim,
+            max_seq_len=self.max_seq_len,
+            rope_base=self.rope_base,
+            norm_eps=self.norm_eps,
+            attn_dropout=self.dropout,
+        )
+
+    def to_empty(
+        self, *, device: Optional[Union[str, torch.device, int]], recurse: bool = True
+    ):
+        self.feature_fusion.to_empty(device=device, recurse=recurse)
+        self.input_projection.to_empty(device=device, recurse=recurse)
+        
+        self.draft_decoder.norm.to_empty(device=device, recurse=recurse)
+        
+        for layer in self.draft_decoder.layers:
+        
+            layer.sa_norm.to_empty(device=device, recurse=recurse)
+            layer.mlp_norm.to_empty(device=device, recurse=recurse)
+        
+        
+            layer.attn.q_proj.to_empty(device=device, recurse=recurse)
+            layer.attn.k_proj.to_empty(device=device, recurse=recurse)
+            layer.attn.v_proj.to_empty(device=device, recurse=recurse)
+            layer.attn.output_proj.to_empty(device=device, recurse=recurse)
+            
+            layer.mlp.router.gate.to_empty(device=device, recurse=recurse)
+            layer.mlp.experts.to_empty(device=device, recurse=recurse)
+            layer.mlp.shared_expert.w1.to_empty(device=device, recurse=recurse)
+            layer.mlp.shared_expert.w2.to_empty(device=device, recurse=recurse)
+            layer.mlp.shared_expert.w3.to_empty(device=device, recurse=recurse)
+            
+            # layer.mlp.w1.to_empty(device=device, recurse=recurse)
+            # layer.mlp.w2.to_empty(device=device, recurse=recurse)
+            # layer.mlp.w3.to_empty(device=device, recurse=recurse)
+
+
+
+    def initialize_parameters(self):
+        """Initialize weights for the draft model."""
+        # Initialize feature fusion layer
+        nn.init.xavier_uniform_(self.feature_fusion.weight)
+        if self.feature_fusion.bias is not None:
+            nn.init.zeros_(self.feature_fusion.bias)
+
+        # Initialize input projection layer
+        nn.init.xavier_uniform_(self.input_projection.weight)
+        if self.input_projection.bias is not None:
+            nn.init.zeros_(self.input_projection.bias)
+
+        nn.init.ones_(self.draft_decoder.norm.scale)
+
+        # Initialize draft decoder layers
+        for layer in self.draft_decoder.layers:
+            layer.attn.q_proj.reset_parameters()
+            layer.attn.k_proj.reset_parameters()
+            layer.attn.v_proj.reset_parameters()
+            layer.attn.output_proj.reset_parameters()
+            
+            nn.init.ones_(layer.sa_norm.scale)
+            nn.init.ones_(layer.mlp_norm.scale)
+            
+            layer.mlp.experts.reset_parameters()
+            layer.mlp.router.gate.reset_parameters()
+            layer.mlp.shared_expert.w1.reset_parameters()
+            layer.mlp.shared_expert.w2.reset_parameters()
+            layer.mlp.shared_expert.w3.reset_parameters()
+            
+
+    def forward(
+        self,
+        tokens: torch.Tensor,
+        *,
+        mask: Optional[torch.Tensor] = None,
+        input_pos: Optional[torch.Tensor] = None,
+        input_embeds: Optional[torch.Tensor] = None,
+        input_hidden: Optional[List[torch.Tensor]] = None,
+    ):
+        """
+        Args:
+            target_multi_features: 目标模型的多层特征
+            token_embeddings: Token embeddings
+            attention_mask: Attention mask
+        """
+
+        # 1. 融合多层特征
+        feature_list = []
+        for feature in input_hidden:
+            feature_list.append(feature)
+
+        
+        # 拼接多层特征 [B, seq_len, 3*embed_dim]
+        concatenated_features = torch.cat(feature_list, dim=-1)
+        # 降维到embed_dim [B, seq_len, embed_dim]
+        fused_features = self.feature_fusion(concatenated_features)
+
+        # 2. 特征与token embedding融合
+        # [B, seq_len, 2*embed_dim] -> [B, seq_len, embed_dim]
+        combined_input = torch.cat([input_embeds, fused_features], dim=-1)
+        projected_input = self.input_projection(combined_input)
+
+        # 3. Draft decoder前向传播
+        draft_outputs = self.draft_decoder(
+            tokens=None,
+            mask=mask,
+            input_embeds=projected_input
+        )
+
+        # 4. 输出投影
+        hidden_states = draft_outputs
+
+        # return {
+        #     'hidden_states': hidden_states,
+        #     'logits': draft_outputs.logits,
+        #     'past_key_values': draft_outputs.past_key_values if hasattr(draft_outputs, 'past_key_values') else None,
+        #     'fused_features': fused_features,
+        # }
+        return hidden_states
+
+
+def llama4_draft_model(
+    *,
+    vocab_size: int = 128256,
+    num_layers: int = 1,
+    num_heads: int = 32,
+    num_kv_heads: int = 8,
+    embed_dim: int = 4096,
+    intermediate_dim: int = 11008,
+    max_seq_len: int = 8192,
+    rope_base: float = 500000,
+    norm_eps: float = 1e-5,
+    num_feature_layers: int = 3,  # 融合几层特征(low, mid, high)
+    dropout: float = 0.0,
+) -> nn.Module:
+    """
+    EAGLE-3 Draft Model Builder
+    
+    Args:
+        vocab_size: Vocabulary size
+        num_layers: Number of transformer layers (usually 1 for draft model)  
+        num_heads: Number of attention heads
+        num_kv_heads: Number of key-value heads
+        embed_dim: Hidden dimension
+        intermediate_dim: MLP intermediate dimension
+        max_seq_len: Maximum sequence length
+        rope_base: RoPE base frequency
+        norm_eps: Layer norm epsilon
+        num_feature_layers: Number of target model layers to fuse (low, mid, high)
+        dropout: Dropout rate
+        
+    Returns:
+        EAGLE3DraftModel instance
+    """
+
+    return EAGLE3DraftModel(
+        vocab_size=vocab_size,
+        num_layers=num_layers,
+        num_heads=num_heads,
+        num_kv_heads=num_kv_heads,
+        embed_dim=embed_dim,
+        intermediate_dim=intermediate_dim,
+        max_seq_len=max_seq_len,
+        rope_base=rope_base,
+        norm_eps=norm_eps,
+        num_feature_layers=num_feature_layers,
+        dropout=dropout,
+    )
 
 
 def llama4_vision_encoder(
@@ -313,9 +644,16 @@ def llama4_decoder(
         )
         layers.append(layer)
     layers = nn.ModuleList(layers)
-
+    
     tok_embeddings = nn.Embedding(vocab_size, embed_dim)
     output_proj = nn.Linear(embed_dim, vocab_size, bias=False)
+    
+    num_layers = len(layers)
+    low = 2
+    mid = num_layers // 2
+    high = num_layers - 2
+    output_hidden_states = [low, mid, high]
+    
     return TransformerDecoder(
         tok_embeddings=tok_embeddings,
         layers=layers,
@@ -324,6 +662,7 @@ def llama4_decoder(
         head_dim=head_dim,
         norm=RMSNorm(dim=embed_dim, eps=norm_eps),
         output=output_proj,
+        output_hidden_states=output_hidden_states
     )
 
 

@@ -185,6 +185,8 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
         self._clip_grad_norm = cfg.get("clip_grad_norm", None)
 
         self._save_adapter_weights_only = cfg.get("save_adapter_weights_only", False)
+        # used for draft model
+        self._save_draft_weights_only = cfg.get("save_draft_weights_only", True)
         self._resume_from_checkpoint = cfg.resume_from_checkpoint
         self._gradient_accumulation_steps = cfg.gradient_accumulation_steps
 
@@ -283,6 +285,7 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
 
         self._compile = cfg.get("compile", False)
 
+        # we dont have draft key in state dict
         self._model = self._setup_model(
             cfg_model=cfg.model,
             enable_activation_checkpointing=self._enable_activation_checkpointing,
@@ -448,21 +451,7 @@ class LoRAFinetuneRecipeDistributed(FTRecipeInterface):
            c. We register (pre-)forward hooks with ``fully_shard`` instead of wrapping `nn.Module`
         """
 
-        self._lora_rank = cfg_model.lora_rank
-        self._lora_alpha = cfg_model.lora_alpha
-        self._lora_attn_modules = list(cfg_model.lora_attn_modules)
-        self._apply_lora_to_mlp = cfg_model.apply_lora_to_mlp
         self._apply_lora_to_output = getattr(cfg_model, "apply_lora_to_output", False)
-        self._adapter_config = {
-            "r": self._lora_rank,
-            "lora_alpha": self._lora_alpha,
-            "target_modules": get_lora_module_names(
-                self._lora_attn_modules,
-                self._apply_lora_to_mlp,
-                self._apply_lora_to_output,
-            ),
-            "peft_type": "LORA",
-        }
 
         utils.log_rank_zero(
             self._logger,

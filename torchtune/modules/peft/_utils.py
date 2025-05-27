@@ -64,8 +64,27 @@ def get_adapter_params(model: nn.Module) -> dict[str, nn.Parameter]:
     return adapter_params
 
 
+def get_draft_params(model: nn.Module) -> dict[str, nn.Parameter]:
+    """
+    Return the subset of parameters from a model that correspond to draft layers.
+    Returns all parameters whose names start with "draft.".
+
+    Args:
+        model (nn.Module): Instance of model class containing some draft params.
+
+    Returns:
+        dict[str, nn.Parameter]: the subset of model's state dict containing
+        only draft parameters.
+    """
+    draft_params = {}
+    for name, param in model.named_parameters():
+        if name.startswith("draft."):
+            draft_params[name] = param
+    return draft_params
+
+
 def set_trainable_params(
-    model: nn.Module, adapter_params: Union[dict[str, Any], set]
+    model: nn.Module, adapter_params: Union[dict[str, Any], set] = None
 ) -> None:
     """
     Set trainable parameters for an nn.Module based on a state dict of adapter parameters.

@@ -10,6 +10,7 @@ from torchtune.data._prompt_templates import _TemplateType
 from torchtune.models.llama4 import (
     llama4_decoder,
     llama4_vision_encoder,
+    llama4_draft_model,
     lora_llama4_decoder,
     lora_llama4_vision_encoder,
 )
@@ -47,9 +48,6 @@ def llama4_scout_17b_16e(
     Returns:
         EarlyFusionModel: Instantiation of a 17Bx16E Llama4 MoE model with encoders.
     """
-    assert torch_version_ge(
-        "2.8"
-    ), "Llama4 Scout requires Pytorch 2.8 or higher (Nightlies)"
 
     decoder_embed_dim = 5120
 
@@ -82,6 +80,19 @@ def llama4_scout_17b_16e(
         attention_chunk_size=8192,
         use_scaled_rope=True,
     )
+    
+    draft = llama4_draft_model(
+        vocab_size=202_048,
+        num_layers=1,
+        num_heads=40,
+        num_kv_heads=8,
+        embed_dim=decoder_embed_dim,
+        intermediate_dim=8192,
+        max_seq_len=10485760,
+        rope_base=500_000,
+        norm_eps=1e-5,
+    )
+    
     return EarlyFusionModel(
         decoder,
         encoders={"vision": vision_encoder},
@@ -89,10 +100,11 @@ def llama4_scout_17b_16e(
             "vision": LLAMA4_SPECIAL_TOKENS["<|patch|>"],
         },
         encoders_trainable={
-            "vision": encoder_trainable,
+            "vision": False,
         },
-        decoder_trainable=decoder_trainable,
-        fusion_trainable=fusion_trainable,
+        draft=draft,
+        decoder_trainable=False,
+        fusion_trainable=False,
     )
 
 
@@ -115,9 +127,6 @@ def llama4_maverick_17b_128e(
     Returns:
         EarlyFusionModel: Instantiation of a 17Bx128E Llama4 MoE model with encoders.
     """
-    assert torch_version_ge(
-        "2.8"
-    ), "Llama4 Maverick requires Pytorch 2.8 or higher (Nightlies)"
 
     decoder_embed_dim = 5120
 
@@ -312,12 +321,26 @@ def lora_llama4_scout_17b_16e(
         use_dora=use_dora,
         quantize_base=quantize_base,
     )
+    
+    draft = llama4_draft_model(
+        vocab_size=202_048,
+        num_layers=1,
+        num_heads=40,
+        num_kv_heads=8,
+        embed_dim=decoder_embed_dim,
+        intermediate_dim=8192,
+        max_seq_len=10485760,
+        rope_base=500_000,
+        norm_eps=1e-5,
+    )
+    
     return EarlyFusionModel(
         decoder,
         encoders={"vision": vision_encoder},
         encoder_tokens={
             "vision": LLAMA4_SPECIAL_TOKENS["<|patch|>"],
         },
+        draft=draft,
         encoders_trainable={
             "vision": encoder_trainable != TrainableParams.FROZEN,
         },

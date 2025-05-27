@@ -8,6 +8,7 @@ from ._component_builders import (
     llama4_decoder,
     llama4_vision_encoder,
     llama4_vision_projection_head,
+    llama4_draft_model,
     lora_llama4_decoder,
     lora_llama4_vision_encoder,
     lora_llama4_vision_projection_head,

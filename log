@@ -1,0 +1,783 @@
+W0527 06:41:15.855000 571677 torch/distributed/run.py:792] 
+W0527 06:41:15.855000 571677 torch/distributed/run.py:792] *****************************************
+W0527 06:41:15.855000 571677 torch/distributed/run.py:792] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0527 06:41:15.855000 571677 torch/distributed/run.py:792] *****************************************
+INFO:torchtune.utils._logging:Running FullFinetuneRecipeDistributed with resolved config:
+
+batch_size: 20
+checkpointer:
+  _component_: torchtune.training.FullModelHFCheckpointer
+  checkpoint_dir: /tmp/Llama-4-Scout-17B-16E-Instruct
+  checkpoint_files:
+    filename_format: model-{}-of-{}.safetensors
+    max_filename: '00050'
+  model_type: LLAMA4
+  output_dir: /tmp/torchtune/llama4_17Bx16E/full
+  recipe_checkpoint: null
+clip_grad_norm: null
+compile: false
+data_parallel_replicate_dim: 1
+data_parallel_shard_dim: -1
+dataset:
+  _component_: torchtune.datasets.alpaca_dataset
+  packed: false
+device: cuda
+dtype: bf16
+enable_activation_checkpointing: false
+enable_activation_offloading: false
+epochs: 1
+fsdp_cpu_offload: false
+gradient_accumulation_steps: 1
+log_every_n_steps: 1
+log_level: INFO
+log_peak_memory_stats: true
+loss:
+  _component_: torchtune.modules.loss.DraftLoss
+max_steps_per_epoch: null
+metric_logger:
+  _component_: torchtune.training.metric_logging.DiskLogger
+  log_dir: /tmp/torchtune/llama4_17Bx16E/full/logs
+model:
+  _component_: torchtune.models.llama4.llama4_scout_17b_16e
+optimizer:
+  _component_: torch.optim.AdamW
+  fused: false
+  lr: 2.0e-05
+optimizer_in_bwd: false
+output_dir: /tmp/torchtune/llama4_17Bx16E/full
+profiler:
+  _component_: torchtune.training.setup_torch_profiler
+  enabled: false
+resume_from_checkpoint: false
+seed: null
+shuffle: true
+tensor_parallel_dim: 1
+tensor_parallel_plan:
+  _component_: torchtune.models.llama4.decoder_only_tp_plan
+tokenizer:
+  _component_: torchtune.models.llama4.llama4_transform
+  max_num_tiles: 16
+  max_seq_len: null
+  path: /tmp/Llama-4-Scout-17B-16E-Instruct/tokenizer.model
+
+INFO:torchtune.utils._logging:Running FullFinetuneRecipeDistributed with resolved config:
+
+batch_size: 20
+checkpointer:
+  _component_: torchtune.training.FullModelHFCheckpointer
+  checkpoint_dir: /tmp/Llama-4-Scout-17B-16E-Instruct
+  checkpoint_files:
+    filename_format: model-{}-of-{}.safetensors
+    max_filename: '00050'
+  model_type: LLAMA4
+  output_dir: /tmp/torchtune/llama4_17Bx16E/full
+  recipe_checkpoint: null
+clip_grad_norm: null
+compile: false
+data_parallel_replicate_dim: 1
+data_parallel_shard_dim: -1
+dataset:
+  _component_: torchtune.datasets.alpaca_dataset
+  packed: false
+device: cuda
+dtype: bf16
+enable_activation_checkpointing: false
+enable_activation_offloading: false
+epochs: 1
+fsdp_cpu_offload: false
+gradient_accumulation_steps: 1
+log_every_n_steps: 1
+log_level: INFO
+log_peak_memory_stats: true
+loss:
+  _component_: torchtune.modules.loss.DraftLoss
+max_steps_per_epoch: null
+metric_logger:
+  _component_: torchtune.training.metric_logging.DiskLogger
+  log_dir: /tmp/torchtune/llama4_17Bx16E/full/logs
+model:
+  _component_: torchtune.models.llama4.llama4_scout_17b_16e
+optimizer:
+  _component_: torch.optim.AdamW
+  fused: false
+  lr: 2.0e-05
+optimizer_in_bwd: false
+output_dir: /tmp/torchtune/llama4_17Bx16E/full
+profiler:
+  _component_: torchtune.training.setup_torch_profiler
+  enabled: false
+resume_from_checkpoint: false
+seed: null
+shuffle: true
+tensor_parallel_dim: 1
+tensor_parallel_plan:
+  _component_: torchtune.models.llama4.decoder_only_tp_plan
+tokenizer:
+  _component_: torchtune.models.llama4.llama4_transform
+  max_num_tiles: 16
+  max_seq_len: null
+  path: /tmp/Llama-4-Scout-17B-16E-Instruct/tokenizer.model
+
+INFO:torchtune.utils._logging:Running FullFinetuneRecipeDistributed with resolved config:
+
+batch_size: 20
+checkpointer:
+  _component_: torchtune.training.FullModelHFCheckpointer
+  checkpoint_dir: /tmp/Llama-4-Scout-17B-16E-Instruct
+  checkpoint_files:
+    filename_format: model-{}-of-{}.safetensors
+    max_filename: '00050'
+  model_type: LLAMA4
+  output_dir: /tmp/torchtune/llama4_17Bx16E/full
+  recipe_checkpoint: null
+clip_grad_norm: null
+compile: false
+data_parallel_replicate_dim: 1
+data_parallel_shard_dim: -1
+dataset:
+  _component_: torchtune.datasets.alpaca_dataset
+  packed: false
+device: cuda
+dtype: bf16
+enable_activation_checkpointing: false
+enable_activation_offloading: false
+epochs: 1
+fsdp_cpu_offload: false
+gradient_accumulation_steps: 1
+log_every_n_steps: 1
+log_level: INFO
+log_peak_memory_stats: true
+loss:
+  _component_: torchtune.modules.loss.DraftLoss
+max_steps_per_epoch: null
+metric_logger:
+  _component_: torchtune.training.metric_logging.DiskLogger
+  log_dir: /tmp/torchtune/llama4_17Bx16E/full/logs
+model:
+  _component_: torchtune.models.llama4.llama4_scout_17b_16e
+optimizer:
+  _component_: torch.optim.AdamW
+  fused: false
+  lr: 2.0e-05
+optimizer_in_bwd: false
+output_dir: /tmp/torchtune/llama4_17Bx16E/full
+profiler:
+  _component_: torchtune.training.setup_torch_profiler
+  enabled: false
+resume_from_checkpoint: false
+seed: null
+shuffle: true
+tensor_parallel_dim: 1
+tensor_parallel_plan:
+  _component_: torchtune.models.llama4.decoder_only_tp_plan
+tokenizer:
+  _component_: torchtune.models.llama4.llama4_transform
+  max_num_tiles: 16
+  max_seq_len: null
+  path: /tmp/Llama-4-Scout-17B-16E-Instruct/tokenizer.model
+
+INFO:torchtune.utils._logging:Running FullFinetuneRecipeDistributed with resolved config:
+
+batch_size: 20
+checkpointer:
+  _component_: torchtune.training.FullModelHFCheckpointer
+  checkpoint_dir: /tmp/Llama-4-Scout-17B-16E-Instruct
+  checkpoint_files:
+    filename_format: model-{}-of-{}.safetensors
+    max_filename: '00050'
+  model_type: LLAMA4
+  output_dir: /tmp/torchtune/llama4_17Bx16E/full
+  recipe_checkpoint: null
+clip_grad_norm: null
+compile: false
+data_parallel_replicate_dim: 1
+data_parallel_shard_dim: -1
+dataset:
+  _component_: torchtune.datasets.alpaca_dataset
+  packed: false
+device: cuda
+dtype: bf16
+enable_activation_checkpointing: false
+enable_activation_offloading: false
+epochs: 1
+fsdp_cpu_offload: false
+gradient_accumulation_steps: 1
+log_every_n_steps: 1
+log_level: INFO
+log_peak_memory_stats: true
+loss:
+  _component_: torchtune.modules.loss.DraftLoss
+max_steps_per_epoch: null
+metric_logger:
+  _component_: torchtune.training.metric_logging.DiskLogger
+  log_dir: /tmp/torchtune/llama4_17Bx16E/full/logs
+model:
+  _component_: torchtune.models.llama4.llama4_scout_17b_16e
+optimizer:
+  _component_: torch.optim.AdamW
+  fused: false
+  lr: 2.0e-05
+optimizer_in_bwd: false
+output_dir: /tmp/torchtune/llama4_17Bx16E/full
+profiler:
+  _component_: torchtune.training.setup_torch_profiler
+  enabled: false
+resume_from_checkpoint: false
+seed: null
+shuffle: true
+tensor_parallel_dim: 1
+tensor_parallel_plan:
+  _component_: torchtune.models.llama4.decoder_only_tp_plan
+tokenizer:
+  _component_: torchtune.models.llama4.llama4_transform
+  max_num_tiles: 16
+  max_seq_len: null
+  path: /tmp/Llama-4-Scout-17B-16E-Instruct/tokenizer.model
+
+INFO:torchtune.utils._logging:Running FullFinetuneRecipeDistributed with resolved config:
+
+batch_size: 20
+checkpointer:
+  _component_: torchtune.training.FullModelHFCheckpointer
+  checkpoint_dir: /tmp/Llama-4-Scout-17B-16E-Instruct
+  checkpoint_files:
+    filename_format: model-{}-of-{}.safetensors
+    max_filename: '00050'
+  model_type: LLAMA4
+  output_dir: /tmp/torchtune/llama4_17Bx16E/full
+  recipe_checkpoint: null
+clip_grad_norm: null
+compile: false
+data_parallel_replicate_dim: 1
+data_parallel_shard_dim: -1
+dataset:
+  _component_: torchtune.datasets.alpaca_dataset
+  packed: false
+device: cuda
+dtype: bf16
+enable_activation_checkpointing: false
+enable_activation_offloading: false
+epochs: 1
+fsdp_cpu_offload: false
+gradient_accumulation_steps: 1
+log_every_n_steps: 1
+log_level: INFO
+log_peak_memory_stats: true
+loss:
+  _component_: torchtune.modules.loss.DraftLoss
+max_steps_per_epoch: null
+metric_logger:
+  _component_: torchtune.training.metric_logging.DiskLogger
+  log_dir: /tmp/torchtune/llama4_17Bx16E/full/logs
+model:
+  _component_: torchtune.models.llama4.llama4_scout_17b_16e
+optimizer:
+  _component_: torch.optim.AdamW
+  fused: false
+  lr: 2.0e-05
+optimizer_in_bwd: false
+output_dir: /tmp/torchtune/llama4_17Bx16E/full
+profiler:
+  _component_: torchtune.training.setup_torch_profiler
+  enabled: false
+resume_from_checkpoint: false
+seed: null
+shuffle: true
+tensor_parallel_dim: 1
+tensor_parallel_plan:
+  _component_: torchtune.models.llama4.decoder_only_tp_plan
+tokenizer:
+  _component_: torchtune.models.llama4.llama4_transform
+  max_num_tiles: 16
+  max_seq_len: null
+  path: /tmp/Llama-4-Scout-17B-16E-Instruct/tokenizer.model
+
+INFO:torchtune.utils._logging:Running FullFinetuneRecipeDistributed with resolved config:
+
+batch_size: 20
+checkpointer:
+  _component_: torchtune.training.FullModelHFCheckpointer
+  checkpoint_dir: /tmp/Llama-4-Scout-17B-16E-Instruct
+  checkpoint_files:
+    filename_format: model-{}-of-{}.safetensors
+    max_filename: '00050'
+  model_type: LLAMA4
+  output_dir: /tmp/torchtune/llama4_17Bx16E/full
+  recipe_checkpoint: null
+clip_grad_norm: null
+compile: false
+data_parallel_replicate_dim: 1
+data_parallel_shard_dim: -1
+dataset:
+  _component_: torchtune.datasets.alpaca_dataset
+  packed: false
+device: cuda
+dtype: bf16
+enable_activation_checkpointing: false
+enable_activation_offloading: false
+epochs: 1
+fsdp_cpu_offload: false
+gradient_accumulation_steps: 1
+log_every_n_steps: 1
+log_level: INFO
+log_peak_memory_stats: true
+loss:
+  _component_: torchtune.modules.loss.DraftLoss
+max_steps_per_epoch: null
+metric_logger:
+  _component_: torchtune.training.metric_logging.DiskLogger
+  log_dir: /tmp/torchtune/llama4_17Bx16E/full/logs
+model:
+  _component_: torchtune.models.llama4.llama4_scout_17b_16e
+optimizer:
+  _component_: torch.optim.AdamW
+  fused: false
+  lr: 2.0e-05
+optimizer_in_bwd: false
+output_dir: /tmp/torchtune/llama4_17Bx16E/full
+profiler:
+  _component_: torchtune.training.setup_torch_profiler
+  enabled: false
+resume_from_checkpoint: false
+seed: null
+shuffle: true
+tensor_parallel_dim: 1
+tensor_parallel_plan:
+  _component_: torchtune.models.llama4.decoder_only_tp_plan
+tokenizer:
+  _component_: torchtune.models.llama4.llama4_transform
+  max_num_tiles: 16
+  max_seq_len: null
+  path: /tmp/Llama-4-Scout-17B-16E-Instruct/tokenizer.model
+
+INFO:torchtune.utils._logging:Running FullFinetuneRecipeDistributed with resolved config:
+
+batch_size: 20
+checkpointer:
+  _component_: torchtune.training.FullModelHFCheckpointer
+  checkpoint_dir: /tmp/Llama-4-Scout-17B-16E-Instruct
+  checkpoint_files:
+    filename_format: model-{}-of-{}.safetensors
+    max_filename: '00050'
+  model_type: LLAMA4
+  output_dir: /tmp/torchtune/llama4_17Bx16E/full
+  recipe_checkpoint: null
+clip_grad_norm: null
+compile: false
+data_parallel_replicate_dim: 1
+data_parallel_shard_dim: -1
+dataset:
+  _component_: torchtune.datasets.alpaca_dataset
+  packed: false
+device: cuda
+dtype: bf16
+enable_activation_checkpointing: false
+enable_activation_offloading: false
+epochs: 1
+fsdp_cpu_offload: false
+gradient_accumulation_steps: 1
+log_every_n_steps: 1
+log_level: INFO
+log_peak_memory_stats: true
+loss:
+  _component_: torchtune.modules.loss.DraftLoss
+max_steps_per_epoch: null
+metric_logger:
+  _component_: torchtune.training.metric_logging.DiskLogger
+  log_dir: /tmp/torchtune/llama4_17Bx16E/full/logs
+model:
+  _component_: torchtune.models.llama4.llama4_scout_17b_16e
+optimizer:
+  _component_: torch.optim.AdamW
+  fused: false
+  lr: 2.0e-05
+optimizer_in_bwd: false
+output_dir: /tmp/torchtune/llama4_17Bx16E/full
+profiler:
+  _component_: torchtune.training.setup_torch_profiler
+  enabled: false
+resume_from_checkpoint: false
+seed: null
+shuffle: true
+tensor_parallel_dim: 1
+tensor_parallel_plan:
+  _component_: torchtune.models.llama4.decoder_only_tp_plan
+tokenizer:
+  _component_: torchtune.models.llama4.llama4_transform
+  max_num_tiles: 16
+  max_seq_len: null
+  path: /tmp/Llama-4-Scout-17B-16E-Instruct/tokenizer.model
+
+INFO:torchtune.utils._logging:Running FullFinetuneRecipeDistributed with resolved config:
+
+batch_size: 20
+checkpointer:
+  _component_: torchtune.training.FullModelHFCheckpointer
+  checkpoint_dir: /tmp/Llama-4-Scout-17B-16E-Instruct
+  checkpoint_files:
+    filename_format: model-{}-of-{}.safetensors
+    max_filename: '00050'
+  model_type: LLAMA4
+  output_dir: /tmp/torchtune/llama4_17Bx16E/full
+  recipe_checkpoint: null
+clip_grad_norm: null
+compile: false
+data_parallel_replicate_dim: 1
+data_parallel_shard_dim: -1
+dataset:
+  _component_: torchtune.datasets.alpaca_dataset
+  packed: false
+device: cuda
+dtype: bf16
+enable_activation_checkpointing: false
+enable_activation_offloading: false
+epochs: 1
+fsdp_cpu_offload: false
+gradient_accumulation_steps: 1
+log_every_n_steps: 1
+log_level: INFO
+log_peak_memory_stats: true
+loss:
+  _component_: torchtune.modules.loss.DraftLoss
+max_steps_per_epoch: null
+metric_logger:
+  _component_: torchtune.training.metric_logging.DiskLogger
+  log_dir: /tmp/torchtune/llama4_17Bx16E/full/logs
+model:
+  _component_: torchtune.models.llama4.llama4_scout_17b_16e
+optimizer:
+  _component_: torch.optim.AdamW
+  fused: false
+  lr: 2.0e-05
+optimizer_in_bwd: false
+output_dir: /tmp/torchtune/llama4_17Bx16E/full
+profiler:
+  _component_: torchtune.training.setup_torch_profiler
+  enabled: false
+resume_from_checkpoint: false
+seed: null
+shuffle: true
+tensor_parallel_dim: 1
+tensor_parallel_plan:
+  _component_: torchtune.models.llama4.decoder_only_tp_plan
+tokenizer:
+  _component_: torchtune.models.llama4.llama4_transform
+  max_num_tiles: 16
+  max_seq_len: null
+  path: /tmp/Llama-4-Scout-17B-16E-Instruct/tokenizer.model
+
+Writing logs to /tmp/torchtune/llama4_17Bx16E/full/logs/log_1748328094.txt
+INFO:torchtune.utils._logging:Distributed training is enabled. Instantiating model and loading checkpoint on Rank 0 ...
+INFO:torchtune.utils._logging:Instantiating model and loading checkpoint took 144.02 secs
+INFO:torchtune.utils._logging:Memory stats after model init:
+	GPU peak memory active: 32.78 GiB
+	GPU peak memory alloc: 32.78 GiB
+	GPU peak memory reserved: 33.92 GiB
+INFO:torchtune.utils._logging:Optimizer is initialized.
+INFO:torchtune.utils._logging:Loss is initialized.
+INFO:torchtune.utils._logging:No learning rate scheduler configured. Using constant learning rate.
+WARNING:torchtune.utils._logging: Profiling disabled.
+INFO:torchtune.utils._logging: Profiler config after instantiation: {'enabled': False}
+  0%|          | 0/325 [00:00<?, ?it/s]DEBUG:torchtune.utils._logging:Using flex attention for attention computation since a BlockMask was passed in.
+  0%|          | 1/325 [00:02<14:13,  2.63s/it]1|1|Loss: 0.0012053713435307145:   0%|          | 1/325 [00:02<14:13,  2.63s/it]1|1|Loss: 0.0012053713435307145:   1%|          | 2/325 [00:04<12:04,  2.24s/it]1|2|Loss: 0.0012043743627145886:   1%|          | 2/325 [00:04<12:04,  2.24s/it]1|2|Loss: 0.0012043743627145886:   1%|          | 3/325 [00:06<10:26,  1.94s/it]1|3|Loss: 0.0011472468031570315:   1%|          | 3/325 [00:06<10:26,  1.94s/it]1|3|Loss: 0.0011472468031570315:   1%|          | 4/325 [00:08<10:26,  1.95s/it]1|4|Loss: 0.001140616717748344:   1%|          | 4/325 [00:08<10:26,  1.95s/it] 1|4|Loss: 0.001140616717748344:   2%|▏         | 5/325 [00:09<09:35,  1.80s/it]1|5|Loss: 0.0011191347148269415:   2%|▏         | 5/325 [00:09<09:35,  1.80s/it]1|5|Loss: 0.0011191347148269415:   2%|▏         | 6/325 [00:11<09:44,  1.83s/it]1|6|Loss: 0.0011483863927423954:   2%|▏         | 6/325 [00:11<09:44,  1.83s/it]1|6|Loss: 0.0011483863927423954:   2%|▏         | 7/325 [00:13<09:16,  1.75s/it]1|7|Loss: 0.001183358021080494:   2%|▏         | 7/325 [00:13<09:16,  1.75s/it] 1|7|Loss: 0.001183358021080494:   2%|▏         | 8/325 [00:14<08:46,  1.66s/it]1|8|Loss: 0.001109918113797903:   2%|▏         | 8/325 [00:14<08:46,  1.66s/it]1|8|Loss: 0.001109918113797903:   3%|▎         | 9/325 [00:16<08:24,  1.60s/it]1|9|Loss: 0.0012110521784052253:   3%|▎         | 9/325 [00:16<08:24,  1.60s/it]1|9|Loss: 0.0012110521784052253:   3%|▎         | 10/325 [00:17<08:31,  1.62s/it]1|10|Loss: 0.0011334163136780262:   3%|▎         | 10/325 [00:17<08:31,  1.62s/it]1|10|Loss: 0.0011334163136780262:   3%|▎         | 11/325 [00:19<08:29,  1.62s/it]1|11|Loss: 0.0010806643404066563:   3%|▎         | 11/325 [00:19<08:29,  1.62s/it]1|11|Loss: 0.0010806643404066563:   4%|▎         | 12/325 [00:20<08:12,  1.57s/it]1|12|Loss: 0.0012472020462155342:   4%|▎         | 12/325 [00:20<08:12,  1.57s/it]1|12|Loss: 0.0012472020462155342:   4%|▍         | 13/325 [00:22<08:03,  1.55s/it]1|13|Loss: 0.0011401231167837977:   4%|▍         | 13/325 [00:22<08:03,  1.55s/it]1|13|Loss: 0.0011401231167837977:   4%|▍         | 14/325 [00:23<07:50,  1.51s/it]1|14|Loss: 0.0011600401485338807:   4%|▍         | 14/325 [00:23<07:50,  1.51s/it]1|14|Loss: 0.0011600401485338807:   5%|▍         | 15/325 [00:25<08:04,  1.56s/it]1|15|Loss: 0.0011009363224729896:   5%|▍         | 15/325 [00:25<08:04,  1.56s/it]1|15|Loss: 0.0011009363224729896:   5%|▍         | 16/325 [00:26<07:53,  1.53s/it]1|16|Loss: 0.0011015435447916389:   5%|▍         | 16/325 [00:26<07:53,  1.53s/it]1|16|Loss: 0.0011015435447916389:   5%|▌         | 17/325 [00:28<07:44,  1.51s/it]1|17|Loss: 0.0011754552833735943:   5%|▌         | 17/325 [00:28<07:44,  1.51s/it]1|17|Loss: 0.0011754552833735943:   6%|▌         | 18/325 [00:30<07:59,  1.56s/it]1|18|Loss: 0.0010746014304459095:   6%|▌         | 18/325 [00:30<07:59,  1.56s/it]1|18|Loss: 0.0010746014304459095:   6%|▌         | 19/325 [00:32<08:38,  1.69s/it]1|19|Loss: 0.0010876476299017668:   6%|▌         | 19/325 [00:32<08:38,  1.69s/it]1|19|Loss: 0.0010876476299017668:   6%|▌         | 20/325 [00:33<08:21,  1.64s/it]1|20|Loss: 0.0011659851297736168:   6%|▌         | 20/325 [00:33<08:21,  1.64s/it]1|20|Loss: 0.0011659851297736168:   6%|▋         | 21/325 [00:35<09:01,  1.78s/it]1|21|Loss: 0.0010960822692140937:   6%|▋         | 21/325 [00:35<09:01,  1.78s/it]1|21|Loss: 0.0010960822692140937:   7%|▋         | 22/325 [00:37<08:46,  1.74s/it]1|22|Loss: 0.0010473626898601651:   7%|▋         | 22/325 [00:37<08:46,  1.74s/it]1|22|Loss: 0.0010473626898601651:   7%|▋         | 23/325 [00:38<08:31,  1.69s/it]1|23|Loss: 0.001058567431755364:   7%|▋         | 23/325 [00:38<08:31,  1.69s/it] 1|23|Loss: 0.001058567431755364:   7%|▋         | 24/325 [00:40<08:27,  1.69s/it]1|24|Loss: 0.0011055429931730032:   7%|▋         | 24/325 [00:40<08:27,  1.69s/it]1|24|Loss: 0.0011055429931730032:   8%|▊         | 25/325 [00:42<08:20,  1.67s/it]1|25|Loss: 0.0011024819687008858:   8%|▊         | 25/325 [00:42<08:20,  1.67s/it]1|25|Loss: 0.0011024819687008858:   8%|▊         | 26/325 [00:43<08:12,  1.65s/it]1|26|Loss: 0.0011116736568510532:   8%|▊         | 26/325 [00:43<08:12,  1.65s/it]1|26|Loss: 0.0011116736568510532:   8%|▊         | 27/325 [00:45<08:04,  1.63s/it]1|27|Loss: 0.0011068505700677633:   8%|▊         | 27/325 [00:45<08:04,  1.63s/it]1|27|Loss: 0.0011068505700677633:   9%|▊         | 28/325 [00:47<08:05,  1.64s/it]1|28|Loss: 0.001106563489884138:   9%|▊         | 28/325 [00:47<08:05,  1.64s/it] 1|28|Loss: 0.001106563489884138:   9%|▉         | 29/325 [00:48<07:55,  1.61s/it]1|29|Loss: 0.0011571473442018032:   9%|▉         | 29/325 [00:48<07:55,  1.61s/it]1|29|Loss: 0.0011571473442018032:   9%|▉         | 30/325 [00:50<07:44,  1.57s/it]1|30|Loss: 0.0011179003631696105:   9%|▉         | 30/325 [00:50<07:44,  1.57s/it]1|30|Loss: 0.0011179003631696105:  10%|▉         | 31/325 [00:51<07:49,  1.60s/it]1|31|Loss: 0.0011250037932768464:  10%|▉         | 31/325 [00:51<07:49,  1.60s/it]1|31|Loss: 0.0011250037932768464:  10%|▉         | 32/325 [00:53<08:11,  1.68s/it]1|32|Loss: 0.0011188152711838484:  10%|▉         | 32/325 [00:53<08:11,  1.68s/it]1|32|Loss: 0.0011188152711838484:  10%|█         | 33/325 [00:55<08:24,  1.73s/it]1|33|Loss: 0.0010865966323763132:  10%|█         | 33/325 [00:55<08:24,  1.73s/it]1|33|Loss: 0.0010865966323763132:  10%|█         | 34/325 [00:56<07:53,  1.63s/it]1|34|Loss: 0.0011943501885980368:  10%|█         | 34/325 [00:56<07:53,  1.63s/it]1|34|Loss: 0.0011943501885980368:  11%|█         | 35/325 [00:58<08:09,  1.69s/it]1|35|Loss: 0.0010863005882129073:  11%|█         | 35/325 [00:58<08:09,  1.69s/it]1|35|Loss: 0.0010863005882129073:  11%|█         | 36/325 [01:00<07:48,  1.62s/it]1|36|Loss: 0.0011432506144046783:  11%|█         | 36/325 [01:00<07:48,  1.62s/it]1|36|Loss: 0.0011432506144046783:  11%|█▏        | 37/325 [01:01<07:32,  1.57s/it]1|37|Loss: 0.001172814518213272:  11%|█▏        | 37/325 [01:01<07:32,  1.57s/it] 1|37|Loss: 0.001172814518213272:  12%|█▏        | 38/325 [01:03<07:44,  1.62s/it]1|38|Loss: 0.0010576390195637941:  12%|█▏        | 38/325 [01:03<07:44,  1.62s/it]1|38|Loss: 0.0010576390195637941:  12%|█▏        | 39/325 [01:04<07:43,  1.62s/it]1|39|Loss: 0.0010778300929814577:  12%|█▏        | 39/325 [01:04<07:43,  1.62s/it]1|39|Loss: 0.0010778300929814577:  12%|█▏        | 40/325 [01:06<07:51,  1.65s/it]1|40|Loss: 0.0011233342811465263:  12%|█▏        | 40/325 [01:06<07:51,  1.65s/it]1|40|Loss: 0.0011233342811465263:  13%|█▎        | 41/325 [01:08<07:45,  1.64s/it]1|41|Loss: 0.0011348753469064832:  13%|█▎        | 41/325 [01:08<07:45,  1.64s/it]1|41|Loss: 0.0011348753469064832:  13%|█▎        | 42/325 [01:10<08:01,  1.70s/it]1|42|Loss: 0.0011232879478484392:  13%|█▎        | 42/325 [01:10<08:01,  1.70s/it]1|42|Loss: 0.0011232879478484392:  13%|█▎        | 43/325 [01:11<07:47,  1.66s/it]1|43|Loss: 0.0011225086636841297:  13%|█▎        | 43/325 [01:11<07:47,  1.66s/it]1|43|Loss: 0.0011225086636841297:  14%|█▎        | 44/325 [01:13<07:20,  1.57s/it]1|44|Loss: 0.0011697537265717983:  14%|█▎        | 44/325 [01:13<07:20,  1.57s/it]1|44|Loss: 0.0011697537265717983:  14%|█▍        | 45/325 [01:14<07:18,  1.56s/it]1|45|Loss: 0.0010939931962639093:  14%|█▍        | 45/325 [01:14<07:18,  1.56s/it]1|45|Loss: 0.0010939931962639093:  14%|█▍        | 46/325 [01:16<07:35,  1.63s/it]1|46|Loss: 0.0010800128802657127:  14%|█▍        | 46/325 [01:16<07:35,  1.63s/it]1|46|Loss: 0.0010800128802657127:  14%|█▍        | 47/325 [01:17<07:18,  1.58s/it]1|47|Loss: 0.0011038241209462285:  14%|█▍        | 47/325 [01:17<07:18,  1.58s/it]1|47|Loss: 0.0011038241209462285:  15%|█▍        | 48/325 [01:19<07:10,  1.56s/it]1|48|Loss: 0.0011087448801845312:  15%|█▍        | 48/325 [01:19<07:10,  1.56s/it]1|48|Loss: 0.0011087448801845312:  15%|█▌        | 49/325 [01:20<07:06,  1.55s/it]1|49|Loss: 0.001124205649830401:  15%|█▌        | 49/325 [01:20<07:06,  1.55s/it] 1|49|Loss: 0.001124205649830401:  15%|█▌        | 50/325 [01:22<07:10,  1.56s/it]1|50|Loss: 0.0011322848731651902:  15%|█▌        | 50/325 [01:22<07:10,  1.56s/it]1|50|Loss: 0.0011322848731651902:  16%|█▌        | 51/325 [01:23<07:00,  1.53s/it]1|51|Loss: 0.001157146878540516:  16%|█▌        | 51/325 [01:23<07:00,  1.53s/it] 1|51|Loss: 0.001157146878540516:  16%|█▌        | 52/325 [01:25<06:51,  1.51s/it]1|52|Loss: 0.001025887904688716:  16%|█▌        | 52/325 [01:25<06:51,  1.51s/it]1|52|Loss: 0.001025887904688716:  16%|█▋        | 53/325 [01:26<06:48,  1.50s/it]1|53|Loss: 0.0010847371304407716:  16%|█▋        | 53/325 [01:26<06:48,  1.50s/it]1|53|Loss: 0.0010847371304407716:  17%|█▋        | 54/325 [01:28<06:45,  1.50s/it]1|54|Loss: 0.001129120122641325:  17%|█▋        | 54/325 [01:28<06:45,  1.50s/it] 1|54|Loss: 0.001129120122641325:  17%|█▋        | 55/325 [01:29<06:46,  1.51s/it]1|55|Loss: 0.0011013455223292112:  17%|█▋        | 55/325 [01:29<06:46,  1.51s/it]1|55|Loss: 0.0011013455223292112:  17%|█▋        | 56/325 [01:31<06:43,  1.50s/it]1|56|Loss: 0.0010810644598677754:  17%|█▋        | 56/325 [01:31<06:43,  1.50s/it]1|56|Loss: 0.0010810644598677754:  18%|█▊        | 57/325 [01:33<06:53,  1.54s/it]1|57|Loss: 0.0011526384623721242:  18%|█▊        | 57/325 [01:33<06:53,  1.54s/it]1|57|Loss: 0.0011526384623721242:  18%|█▊        | 58/325 [01:34<07:10,  1.61s/it]1|58|Loss: 0.0011164643801748753:  18%|█▊        | 58/325 [01:34<07:10,  1.61s/it]1|58|Loss: 0.0011164643801748753:  18%|█▊        | 59/325 [01:36<06:48,  1.54s/it]1|59|Loss: 0.0011497493833303452:  18%|█▊        | 59/325 [01:36<06:48,  1.54s/it]1|59|Loss: 0.0011497493833303452:  18%|█▊        | 60/325 [01:37<06:39,  1.51s/it]1|60|Loss: 0.0011757350293919444:  18%|█▊        | 60/325 [01:37<06:39,  1.51s/it]1|60|Loss: 0.0011757350293919444:  19%|█▉        | 61/325 [01:39<06:41,  1.52s/it]1|61|Loss: 0.0011220239102840424:  19%|█▉        | 61/325 [01:39<06:41,  1.52s/it]1|61|Loss: 0.0011220239102840424:  19%|█▉        | 62/325 [01:40<06:31,  1.49s/it]1|62|Loss: 0.0011578344274312258:  19%|█▉        | 62/325 [01:40<06:31,  1.49s/it]1|62|Loss: 0.0011578344274312258:  19%|█▉        | 63/325 [01:42<06:28,  1.48s/it]1|63|Loss: 0.001081859809346497:  19%|█▉        | 63/325 [01:42<06:28,  1.48s/it] 1|63|Loss: 0.001081859809346497:  20%|█▉        | 64/325 [01:43<06:27,  1.48s/it]1|64|Loss: 0.0010971674928441644:  20%|█▉        | 64/325 [01:43<06:27,  1.48s/it]1|64|Loss: 0.0010971674928441644:  20%|██        | 65/325 [01:45<06:36,  1.52s/it]1|65|Loss: 0.0011161213042214513:  20%|██        | 65/325 [01:45<06:36,  1.52s/it]1|65|Loss: 0.0011161213042214513:  20%|██        | 66/325 [01:46<06:30,  1.51s/it]1|66|Loss: 0.0011543227592483163:  20%|██        | 66/325 [01:46<06:30,  1.51s/it]1|66|Loss: 0.0011543227592483163:  21%|██        | 67/325 [01:48<06:23,  1.49s/it]1|67|Loss: 0.0011446974240243435:  21%|██        | 67/325 [01:48<06:23,  1.49s/it]1|67|Loss: 0.0011446974240243435:  21%|██        | 68/325 [01:49<06:17,  1.47s/it]1|68|Loss: 0.0010675009107217193:  21%|██        | 68/325 [01:49<06:17,  1.47s/it]1|68|Loss: 0.0010675009107217193:  21%|██        | 69/325 [01:50<06:21,  1.49s/it]1|69|Loss: 0.0010610097087919712:  21%|██        | 69/325 [01:50<06:21,  1.49s/it]1|69|Loss: 0.0010610097087919712:  22%|██▏       | 70/325 [01:52<06:14,  1.47s/it]1|70|Loss: 0.0010773984249681234:  22%|██▏       | 70/325 [01:52<06:14,  1.47s/it]1|70|Loss: 0.0010773984249681234:  22%|██▏       | 71/325 [01:53<06:18,  1.49s/it]1|71|Loss: 0.0010898418258875608:  22%|██▏       | 71/325 [01:53<06:18,  1.49s/it]1|71|Loss: 0.0010898418258875608:  22%|██▏       | 72/325 [01:55<06:21,  1.51s/it]1|72|Loss: 0.0011408553691580892:  22%|██▏       | 72/325 [01:55<06:21,  1.51s/it]1|72|Loss: 0.0011408553691580892:  22%|██▏       | 73/325 [01:56<06:16,  1.49s/it]1|73|Loss: 0.0010889904806390405:  22%|██▏       | 73/325 [01:56<06:16,  1.49s/it]1|73|Loss: 0.0010889904806390405:  23%|██▎       | 74/325 [01:58<06:25,  1.54s/it]1|74|Loss: 0.001052451552823186:  23%|██▎       | 74/325 [01:58<06:25,  1.54s/it] 1|74|Loss: 0.001052451552823186:  23%|██▎       | 75/325 [02:00<06:19,  1.52s/it]1|75|Loss: 0.001058033900335431:  23%|██▎       | 75/325 [02:00<06:19,  1.52s/it]1|75|Loss: 0.001058033900335431:  23%|██▎       | 76/325 [02:01<06:26,  1.55s/it]1|76|Loss: 0.0010543814860284328:  23%|██▎       | 76/325 [02:01<06:26,  1.55s/it]1|76|Loss: 0.0010543814860284328:  24%|██▎       | 77/325 [02:03<06:12,  1.50s/it]1|77|Loss: 0.001130470773205161:  24%|██▎       | 77/325 [02:03<06:12,  1.50s/it] 1|77|Loss: 0.001130470773205161:  24%|██▍       | 78/325 [02:04<06:39,  1.62s/it]1|78|Loss: 0.0010260900016874075:  24%|██▍       | 78/325 [02:04<06:39,  1.62s/it]1|78|Loss: 0.0010260900016874075:  24%|██▍       | 79/325 [02:06<06:50,  1.67s/it]1|79|Loss: 0.0010863268980756402:  24%|██▍       | 79/325 [02:06<06:50,  1.67s/it]1|79|Loss: 0.0010863268980756402:  25%|██▍       | 80/325 [02:08<06:52,  1.68s/it]1|80|Loss: 0.0010558137437328696:  25%|██▍       | 80/325 [02:08<06:52,  1.68s/it]1|80|Loss: 0.0010558137437328696:  25%|██▍       | 81/325 [02:09<06:30,  1.60s/it]1|81|Loss: 0.001105046016164124:  25%|██▍       | 81/325 [02:09<06:30,  1.60s/it] 1|81|Loss: 0.001105046016164124:  25%|██▌       | 82/325 [02:11<06:17,  1.55s/it]1|82|Loss: 0.0011160855647176504:  25%|██▌       | 82/325 [02:11<06:17,  1.55s/it]1|82|Loss: 0.0011160855647176504:  26%|██▌       | 83/325 [02:12<06:13,  1.54s/it]1|83|Loss: 0.0010814998531714082:  26%|██▌       | 83/325 [02:12<06:13,  1.54s/it]1|83|Loss: 0.0010814998531714082:  26%|██▌       | 84/325 [02:14<06:09,  1.53s/it]1|84|Loss: 0.0011910306056961417:  26%|██▌       | 84/325 [02:14<06:09,  1.53s/it]1|84|Loss: 0.0011910306056961417:  26%|██▌       | 85/325 [02:16<06:17,  1.57s/it]1|85|Loss: 0.0010384770575910807:  26%|██▌       | 85/325 [02:16<06:17,  1.57s/it]1|85|Loss: 0.0010384770575910807:  26%|██▋       | 86/325 [02:17<06:10,  1.55s/it]1|86|Loss: 0.0011262557236477733:  26%|██▋       | 86/325 [02:17<06:10,  1.55s/it]1|86|Loss: 0.0011262557236477733:  27%|██▋       | 87/325 [02:19<06:05,  1.54s/it]1|87|Loss: 0.0010877876775339246:  27%|██▋       | 87/325 [02:19<06:05,  1.54s/it]1|87|Loss: 0.0010877876775339246:  27%|██▋       | 88/325 [02:21<06:38,  1.68s/it]1|88|Loss: 0.0010284465970471501:  27%|██▋       | 88/325 [02:21<06:38,  1.68s/it]1|88|Loss: 0.0010284465970471501:  27%|██▋       | 89/325 [02:22<06:18,  1.60s/it]1|89|Loss: 0.001077763270586729:  27%|██▋       | 89/325 [02:22<06:18,  1.60s/it] 1|89|Loss: 0.001077763270586729:  28%|██▊       | 90/325 [02:23<06:11,  1.58s/it]1|90|Loss: 0.0010683080181479454:  28%|██▊       | 90/325 [02:23<06:11,  1.58s/it]1|90|Loss: 0.0010683080181479454:  28%|██▊       | 91/325 [02:25<06:29,  1.66s/it]1|91|Loss: 0.0010811678366735578:  28%|██▊       | 91/325 [02:25<06:29,  1.66s/it]1|91|Loss: 0.0010811678366735578:  28%|██▊       | 92/325 [02:27<06:14,  1.61s/it]1|92|Loss: 0.0010669579496607184:  28%|██▊       | 92/325 [02:27<06:14,  1.61s/it]1|92|Loss: 0.0010669579496607184:  29%|██▊       | 93/325 [02:28<06:11,  1.60s/it]1|93|Loss: 0.001070672762580216:  29%|██▊       | 93/325 [02:28<06:11,  1.60s/it] 1|93|Loss: 0.001070672762580216:  29%|██▉       | 94/325 [02:30<06:01,  1.56s/it]1|94|Loss: 0.0011046268045902252:  29%|██▉       | 94/325 [02:30<06:01,  1.56s/it]1|94|Loss: 0.0011046268045902252:  29%|██▉       | 95/325 [02:31<05:53,  1.54s/it]1|95|Loss: 0.0010757418349385262:  29%|██▉       | 95/325 [02:31<05:53,  1.54s/it]1|95|Loss: 0.0010757418349385262:  30%|██▉       | 96/325 [02:33<05:43,  1.50s/it]1|96|Loss: 0.0010771973757073283:  30%|██▉       | 96/325 [02:33<05:43,  1.50s/it]1|96|Loss: 0.0010771973757073283:  30%|██▉       | 97/325 [02:34<05:47,  1.52s/it]1|97|Loss: 0.001040734234265983:  30%|██▉       | 97/325 [02:34<05:47,  1.52s/it] 1|97|Loss: 0.001040734234265983:  30%|███       | 98/325 [02:37<06:36,  1.74s/it]1|98|Loss: 0.0010012955171987414:  30%|███       | 98/325 [02:37<06:36,  1.74s/it]1|98|Loss: 0.0010012955171987414:  30%|███       | 99/325 [02:38<06:18,  1.68s/it]1|99|Loss: 0.0010763476602733135:  30%|███       | 99/325 [02:38<06:18,  1.68s/it]1|99|Loss: 0.0010763476602733135:  31%|███       | 100/325 [02:40<06:12,  1.65s/it]1|100|Loss: 0.001094897510483861:  31%|███       | 100/325 [02:40<06:12,  1.65s/it]1|100|Loss: 0.001094897510483861:  31%|███       | 101/325 [02:41<06:07,  1.64s/it]1|101|Loss: 0.0009937412105500698:  31%|███       | 101/325 [02:41<06:07,  1.64s/it]1|101|Loss: 0.0009937412105500698:  31%|███▏      | 102/325 [02:43<05:55,  1.59s/it]1|102|Loss: 0.0010595927014946938:  31%|███▏      | 102/325 [02:43<05:55,  1.59s/it]1|102|Loss: 0.0010595927014946938:  32%|███▏      | 103/325 [02:44<05:47,  1.57s/it]1|103|Loss: 0.0010386115172877908:  32%|███▏      | 103/325 [02:44<05:47,  1.57s/it]1|103|Loss: 0.0010386115172877908:  32%|███▏      | 104/325 [02:46<05:39,  1.54s/it]1|104|Loss: 0.0010284074814990163:  32%|███▏      | 104/325 [02:46<05:39,  1.54s/it]1|104|Loss: 0.0010284074814990163:  32%|███▏      | 105/325 [02:47<05:32,  1.51s/it]1|105|Loss: 0.0011029859306290746:  32%|███▏      | 105/325 [02:47<05:32,  1.51s/it]1|105|Loss: 0.0011029859306290746:  33%|███▎      | 106/325 [02:49<05:32,  1.52s/it]1|106|Loss: 0.0010738363489508629:  33%|███▎      | 106/325 [02:49<05:32,  1.52s/it]1|106|Loss: 0.0010738363489508629:  33%|███▎      | 107/325 [02:50<05:27,  1.50s/it]1|107|Loss: 0.0010314955143257976:  33%|███▎      | 107/325 [02:50<05:27,  1.50s/it]1|107|Loss: 0.0010314955143257976:  33%|███▎      | 108/325 [02:52<05:35,  1.55s/it]1|108|Loss: 0.0010469787521287799:  33%|███▎      | 108/325 [02:52<05:35,  1.55s/it]1|108|Loss: 0.0010469787521287799:  34%|███▎      | 109/325 [02:53<05:26,  1.51s/it]1|109|Loss: 0.0010870937258005142:  34%|███▎      | 109/325 [02:53<05:26,  1.51s/it]1|109|Loss: 0.0010870937258005142:  34%|███▍      | 110/325 [02:55<05:23,  1.50s/it]1|110|Loss: 0.0010619419626891613:  34%|███▍      | 110/325 [02:55<05:23,  1.50s/it]1|110|Loss: 0.0010619419626891613:  34%|███▍      | 111/325 [02:56<05:29,  1.54s/it]1|111|Loss: 0.0010732135269790888:  34%|███▍      | 111/325 [02:56<05:29,  1.54s/it]1|111|Loss: 0.0010732135269790888:  34%|███▍      | 112/325 [02:58<05:25,  1.53s/it]1|112|Loss: 0.00106048712041229:  34%|███▍      | 112/325 [02:58<05:25,  1.53s/it]  1|112|Loss: 0.00106048712041229:  35%|███▍      | 113/325 [03:00<05:27,  1.54s/it]1|113|Loss: 0.0010276754619553685:  35%|███▍      | 113/325 [03:00<05:27,  1.54s/it]1|113|Loss: 0.0010276754619553685:  35%|███▌      | 114/325 [03:02<05:54,  1.68s/it]1|114|Loss: 0.0009648651466704905:  35%|███▌      | 114/325 [03:02<05:54,  1.68s/it]1|114|Loss: 0.0009648651466704905:  35%|███▌      | 115/325 [03:03<05:43,  1.63s/it]1|115|Loss: 0.001072507700882852:  35%|███▌      | 115/325 [03:03<05:43,  1.63s/it] 1|115|Loss: 0.001072507700882852:  36%|███▌      | 116/325 [03:05<05:29,  1.58s/it]1|116|Loss: 0.0010946700349450111:  36%|███▌      | 116/325 [03:05<05:29,  1.58s/it]1|116|Loss: 0.0010946700349450111:  36%|███▌      | 117/325 [03:06<05:23,  1.56s/it]1|117|Loss: 0.0011057439260184765:  36%|███▌      | 117/325 [03:06<05:23,  1.56s/it]1|117|Loss: 0.0011057439260184765:  36%|███▋      | 118/325 [03:08<05:30,  1.60s/it]1|118|Loss: 0.001058486057445407:  36%|███▋      | 118/325 [03:08<05:30,  1.60s/it] 1|118|Loss: 0.001058486057445407:  37%|███▋      | 119/325 [03:09<05:18,  1.54s/it]1|119|Loss: 0.0011223518522456288:  37%|███▋      | 119/325 [03:09<05:18,  1.54s/it]1|119|Loss: 0.0011223518522456288:  37%|███▋      | 120/325 [03:11<05:15,  1.54s/it]1|120|Loss: 0.001094358041882515:  37%|███▋      | 120/325 [03:11<05:15,  1.54s/it] 1|120|Loss: 0.001094358041882515:  37%|███▋      | 121/325 [03:12<05:07,  1.51s/it]1|121|Loss: 0.0010695974342525005:  37%|███▋      | 121/325 [03:12<05:07,  1.51s/it]1|121|Loss: 0.0010695974342525005:  38%|███▊      | 122/325 [03:14<05:03,  1.50s/it]1|122|Loss: 0.0010051967110484838:  38%|███▊      | 122/325 [03:14<05:03,  1.50s/it]1|122|Loss: 0.0010051967110484838:  38%|███▊      | 123/325 [03:15<04:56,  1.47s/it]1|123|Loss: 0.0011386593105271459:  38%|███▊      | 123/325 [03:15<04:56,  1.47s/it]1|123|Loss: 0.0011386593105271459:  38%|███▊      | 124/325 [03:17<05:06,  1.52s/it]1|124|Loss: 0.0010358905419707298:  38%|███▊      | 124/325 [03:17<05:06,  1.52s/it]1|124|Loss: 0.0010358905419707298:  38%|███▊      | 125/325 [03:18<04:56,  1.48s/it]1|125|Loss: 0.001073598163202405:  38%|███▊      | 125/325 [03:18<04:56,  1.48s/it] 1|125|Loss: 0.001073598163202405:  39%|███▉      | 126/325 [03:19<04:52,  1.47s/it]1|126|Loss: 0.0010671712225303054:  39%|███▉      | 126/325 [03:19<04:52,  1.47s/it]1|126|Loss: 0.0010671712225303054:  39%|███▉      | 127/325 [03:21<04:54,  1.49s/it]1|127|Loss: 0.001040223054587841:  39%|███▉      | 127/325 [03:21<04:54,  1.49s/it] 1|127|Loss: 0.001040223054587841:  39%|███▉      | 128/325 [03:23<05:49,  1.78s/it]1|128|Loss: 0.001007026294246316:  39%|███▉      | 128/325 [03:23<05:49,  1.78s/it]1|128|Loss: 0.001007026294246316:  40%|███▉      | 129/325 [03:25<05:27,  1.67s/it]1|129|Loss: 0.0010957963531836867:  40%|███▉      | 129/325 [03:25<05:27,  1.67s/it]1|129|Loss: 0.0010957963531836867:  40%|████      | 130/325 [03:26<05:18,  1.63s/it]1|130|Loss: 0.0010616474319249392:  40%|████      | 130/325 [03:26<05:18,  1.63s/it]1|130|Loss: 0.0010616474319249392:  40%|████      | 131/325 [03:28<05:10,  1.60s/it]1|131|Loss: 0.001094204024411738:  40%|████      | 131/325 [03:28<05:10,  1.60s/it] 1|131|Loss: 0.001094204024411738:  41%|████      | 132/325 [03:30<05:38,  1.75s/it]1|132|Loss: 0.0009702388779260218:  41%|████      | 132/325 [03:30<05:38,  1.75s/it]1|132|Loss: 0.0009702388779260218:  41%|████      | 133/325 [03:32<05:48,  1.82s/it]1|133|Loss: 0.00101195415481925:  41%|████      | 133/325 [03:32<05:48,  1.82s/it]  1|133|Loss: 0.00101195415481925:  41%|████      | 134/325 [03:33<05:26,  1.71s/it]1|134|Loss: 0.0010012575658038259:  41%|████      | 134/325 [03:33<05:26,  1.71s/it]1|134|Loss: 0.0010012575658038259:  42%|████▏     | 135/325 [03:35<05:11,  1.64s/it]1|135|Loss: 0.0010354529367759824:  42%|████▏     | 135/325 [03:35<05:11,  1.64s/it]1|135|Loss: 0.0010354529367759824:  42%|████▏     | 136/325 [03:37<05:12,  1.65s/it]1|136|Loss: 0.000994635745882988:  42%|████▏     | 136/325 [03:37<05:12,  1.65s/it] 1|136|Loss: 0.000994635745882988:  42%|████▏     | 137/325 [03:40<06:34,  2.10s/it]1|137|Loss: 0.001065862481482327:  42%|████▏     | 137/325 [03:40<06:34,  2.10s/it]1|137|Loss: 0.001065862481482327:  42%|████▏     | 138/325 [03:41<06:07,  1.97s/it]1|138|Loss: 0.0010146764107048512:  42%|████▏     | 138/325 [03:41<06:07,  1.97s/it]1|138|Loss: 0.0010146764107048512:  43%|████▎     | 139/325 [03:43<05:47,  1.87s/it]1|139|Loss: 0.0010372705291956663:  43%|████▎     | 139/325 [03:43<05:47,  1.87s/it]1|139|Loss: 0.0010372705291956663:  43%|████▎     | 140/325 [03:45<05:35,  1.81s/it]1|140|Loss: 0.0009923609904944897:  43%|████▎     | 140/325 [03:45<05:35,  1.81s/it]1|140|Loss: 0.0009923609904944897:  43%|████▎     | 141/325 [03:47<05:32,  1.81s/it]1|141|Loss: 0.0009858582634478807:  43%|████▎     | 141/325 [03:47<05:32,  1.81s/it]1|141|Loss: 0.0009858582634478807:  44%|████▎     | 142/325 [03:48<05:36,  1.84s/it]1|142|Loss: 0.0010125798871740699:  44%|████▎     | 142/325 [03:48<05:36,  1.84s/it]1|142|Loss: 0.0010125798871740699:  44%|████▍     | 143/325 [03:50<05:17,  1.74s/it]1|143|Loss: 0.0010569505393505096:  44%|████▍     | 143/325 [03:50<05:17,  1.74s/it]1|143|Loss: 0.0010569505393505096:  44%|████▍     | 144/325 [03:51<05:02,  1.67s/it]1|144|Loss: 0.0010509901912882924:  44%|████▍     | 144/325 [03:51<05:02,  1.67s/it]1|144|Loss: 0.0010509901912882924:  45%|████▍     | 145/325 [03:53<04:53,  1.63s/it]1|145|Loss: 0.0009961279574781656:  45%|████▍     | 145/325 [03:53<04:53,  1.63s/it]1|145|Loss: 0.0009961279574781656:  45%|████▍     | 146/325 [03:56<06:03,  2.03s/it]1|146|Loss: 0.0009999519679695368:  45%|████▍     | 146/325 [03:56<06:03,  2.03s/it]1|146|Loss: 0.0009999519679695368:  45%|████▌     | 147/325 [03:57<05:29,  1.85s/it]1|147|Loss: 0.0010678007965907454:  45%|████▌     | 147/325 [03:57<05:29,  1.85s/it]1|147|Loss: 0.0010678007965907454:  46%|████▌     | 148/325 [03:59<05:10,  1.75s/it]1|148|Loss: 0.000989054562523961:  46%|████▌     | 148/325 [03:59<05:10,  1.75s/it] 1|148|Loss: 0.000989054562523961:  46%|████▌     | 149/325 [04:00<04:57,  1.69s/it]1|149|Loss: 0.0009746042196638882:  46%|████▌     | 149/325 [04:00<04:57,  1.69s/it]1|149|Loss: 0.0009746042196638882:  46%|████▌     | 150/325 [04:02<04:51,  1.67s/it]1|150|Loss: 0.0010449892142787576:  46%|████▌     | 150/325 [04:02<04:51,  1.67s/it]1|150|Loss: 0.0010449892142787576:  46%|████▋     | 151/325 [04:03<04:36,  1.59s/it]1|151|Loss: 0.0010567051358520985:  46%|████▋     | 151/325 [04:03<04:36,  1.59s/it]1|151|Loss: 0.0010567051358520985:  47%|████▋     | 152/325 [04:05<04:28,  1.55s/it]1|152|Loss: 0.001047207391820848:  47%|████▋     | 152/325 [04:05<04:28,  1.55s/it] 1|152|Loss: 0.001047207391820848:  47%|████▋     | 153/325 [04:06<04:19,  1.51s/it]1|153|Loss: 0.0010888021206483245:  47%|████▋     | 153/325 [04:06<04:19,  1.51s/it]1|153|Loss: 0.0010888021206483245:  47%|████▋     | 154/325 [04:08<04:22,  1.54s/it]1|154|Loss: 0.0010397485457360744:  47%|████▋     | 154/325 [04:08<04:22,  1.54s/it]1|154|Loss: 0.0010397485457360744:  48%|████▊     | 155/325 [04:10<04:38,  1.64s/it]1|155|Loss: 0.0010095348116010427:  48%|████▊     | 155/325 [04:10<04:38,  1.64s/it]1|155|Loss: 0.0010095348116010427:  48%|████▊     | 156/325 [04:11<04:25,  1.57s/it]1|156|Loss: 0.0010242959251627326:  48%|████▊     | 156/325 [04:11<04:25,  1.57s/it]1|156|Loss: 0.0010242959251627326:  48%|████▊     | 157/325 [04:13<04:20,  1.55s/it]1|157|Loss: 0.0010567342396825552:  48%|████▊     | 157/325 [04:13<04:20,  1.55s/it]1|157|Loss: 0.0010567342396825552:  49%|████▊     | 158/325 [04:14<04:18,  1.55s/it]1|158|Loss: 0.0010601410176604986:  49%|████▊     | 158/325 [04:14<04:18,  1.55s/it]1|158|Loss: 0.0010601410176604986:  49%|████▉     | 159/325 [04:16<04:12,  1.52s/it]1|159|Loss: 0.001037952140904963:  49%|████▉     | 159/325 [04:16<04:12,  1.52s/it] 1|159|Loss: 0.001037952140904963:  49%|████▉     | 160/325 [04:17<04:07,  1.50s/it]1|160|Loss: 0.001004688092507422:  49%|████▉     | 160/325 [04:17<04:07,  1.50s/it]1|160|Loss: 0.001004688092507422:  50%|████▉     | 161/325 [04:19<04:09,  1.52s/it]1|161|Loss: 0.0010031383717432618:  50%|████▉     | 161/325 [04:19<04:09,  1.52s/it]1|161|Loss: 0.0010031383717432618:  50%|████▉     | 162/325 [04:20<04:01,  1.48s/it]1|162|Loss: 0.0010547202546149492:  50%|████▉     | 162/325 [04:20<04:01,  1.48s/it]1|162|Loss: 0.0010547202546149492:  50%|█████     | 163/325 [04:22<04:01,  1.49s/it]1|163|Loss: 0.0010330368531867862:  50%|█████     | 163/325 [04:22<04:01,  1.49s/it]1|163|Loss: 0.0010330368531867862:  50%|█████     | 164/325 [04:23<04:06,  1.53s/it]1|164|Loss: 0.0011199741857126355:  50%|█████     | 164/325 [04:23<04:06,  1.53s/it]1|164|Loss: 0.0011199741857126355:  51%|█████     | 165/325 [04:25<04:02,  1.52s/it]1|165|Loss: 0.0010548557620495558:  51%|█████     | 165/325 [04:25<04:02,  1.52s/it]1|165|Loss: 0.0010548557620495558:  51%|█████     | 166/325 [04:26<04:08,  1.56s/it]1|166|Loss: 0.0009713833569549024:  51%|█████     | 166/325 [04:26<04:08,  1.56s/it]1|166|Loss: 0.0009713833569549024:  51%|█████▏    | 167/325 [04:28<04:00,  1.52s/it]1|167|Loss: 0.0010369170922785997:  51%|█████▏    | 167/325 [04:28<04:00,  1.52s/it]1|167|Loss: 0.0010369170922785997:  52%|█████▏    | 168/325 [04:29<04:00,  1.53s/it]1|168|Loss: 0.0010225150035694242:  52%|█████▏    | 168/325 [04:29<04:00,  1.53s/it]1|168|Loss: 0.0010225150035694242:  52%|█████▏    | 169/325 [04:31<03:55,  1.51s/it]1|169|Loss: 0.0010242376010864973:  52%|█████▏    | 169/325 [04:31<03:55,  1.51s/it]1|169|Loss: 0.0010242376010864973:  52%|█████▏    | 170/325 [04:32<03:49,  1.48s/it]1|170|Loss: 0.0010864000068977475:  52%|█████▏    | 170/325 [04:32<03:49,  1.48s/it]1|170|Loss: 0.0010864000068977475:  53%|█████▎    | 171/325 [04:34<03:58,  1.55s/it]1|171|Loss: 0.000968150794506073:  53%|█████▎    | 171/325 [04:34<03:58,  1.55s/it] 1|171|Loss: 0.000968150794506073:  53%|█████▎    | 172/325 [04:36<03:55,  1.54s/it]1|172|Loss: 0.001034356071613729:  53%|█████▎    | 172/325 [04:36<03:55,  1.54s/it]1|172|Loss: 0.001034356071613729:  53%|█████▎    | 173/325 [04:37<03:48,  1.50s/it]1|173|Loss: 0.0010699655395001173:  53%|█████▎    | 173/325 [04:37<03:48,  1.50s/it]1|173|Loss: 0.0010699655395001173:  54%|█████▎    | 174/325 [04:39<03:53,  1.54s/it]1|174|Loss: 0.0010870753321796656:  54%|█████▎    | 174/325 [04:39<03:53,  1.54s/it]1|174|Loss: 0.0010870753321796656:  54%|█████▍    | 175/325 [04:40<03:50,  1.54s/it]1|175|Loss: 0.0010049501433968544:  54%|█████▍    | 175/325 [04:40<03:50,  1.54s/it]1|175|Loss: 0.0010049501433968544:  54%|█████▍    | 176/325 [04:42<03:51,  1.55s/it]1|176|Loss: 0.0010279404232278466:  54%|█████▍    | 176/325 [04:42<03:51,  1.55s/it]1|176|Loss: 0.0010279404232278466:  54%|█████▍    | 177/325 [04:43<03:43,  1.51s/it]1|177|Loss: 0.0010647861054167151:  54%|█████▍    | 177/325 [04:43<03:43,  1.51s/it]1|177|Loss: 0.0010647861054167151:  55%|█████▍    | 178/325 [04:45<03:51,  1.58s/it]1|178|Loss: 0.0009582652128301561:  55%|█████▍    | 178/325 [04:45<03:51,  1.58s/it]1|178|Loss: 0.0009582652128301561:  55%|█████▌    | 179/325 [04:47<03:56,  1.62s/it]1|179|Loss: 0.001009895233437419:  55%|█████▌    | 179/325 [04:47<03:56,  1.62s/it] 1|179|Loss: 0.001009895233437419:  55%|█████▌    | 180/325 [04:49<04:11,  1.73s/it]1|180|Loss: 0.0010310374200344086:  55%|█████▌    | 180/325 [04:49<04:11,  1.73s/it]1|180|Loss: 0.0010310374200344086:  56%|█████▌    | 181/325 [04:50<04:14,  1.77s/it]1|181|Loss: 0.0010435286676511168:  56%|█████▌    | 181/325 [04:50<04:14,  1.77s/it]1|181|Loss: 0.0010435286676511168:  56%|█████▌    | 182/325 [04:52<03:58,  1.67s/it]1|182|Loss: 0.0011133666848763824:  56%|█████▌    | 182/325 [04:52<03:58,  1.67s/it]1|182|Loss: 0.0011133666848763824:  56%|█████▋    | 183/325 [04:53<03:52,  1.64s/it]1|183|Loss: 0.00105939747299999:  56%|█████▋    | 183/325 [04:53<03:52,  1.64s/it]  1|183|Loss: 0.00105939747299999:  57%|█████▋    | 184/325 [04:55<03:47,  1.61s/it]1|184|Loss: 0.0009695005719549954:  57%|█████▋    | 184/325 [04:55<03:47,  1.61s/it]1|184|Loss: 0.0009695005719549954:  57%|█████▋    | 185/325 [04:56<03:39,  1.57s/it]1|185|Loss: 0.0010340760927647352:  57%|█████▋    | 185/325 [04:56<03:39,  1.57s/it]1|185|Loss: 0.0010340760927647352:  57%|█████▋    | 186/325 [04:58<03:34,  1.54s/it]1|186|Loss: 0.0009533625561743975:  57%|█████▋    | 186/325 [04:58<03:34,  1.54s/it]1|186|Loss: 0.0009533625561743975:  58%|█████▊    | 187/325 [04:59<03:27,  1.50s/it]1|187|Loss: 0.0009946159552782774:  58%|█████▊    | 187/325 [04:59<03:27,  1.50s/it]1|187|Loss: 0.0009946159552782774:  58%|█████▊    | 188/325 [05:01<03:24,  1.49s/it]1|188|Loss: 0.000987020437605679:  58%|█████▊    | 188/325 [05:01<03:24,  1.49s/it] 1|188|Loss: 0.000987020437605679:  58%|█████▊    | 189/325 [05:02<03:21,  1.48s/it]1|189|Loss: 0.001081662718206644:  58%|█████▊    | 189/325 [05:02<03:21,  1.48s/it]1|189|Loss: 0.001081662718206644:  58%|█████▊    | 190/325 [05:04<03:21,  1.49s/it]1|190|Loss: 0.001057683490216732:  58%|█████▊    | 190/325 [05:04<03:21,  1.49s/it]1|190|Loss: 0.001057683490216732:  59%|█████▉    | 191/325 [05:06<03:36,  1.62s/it]1|191|Loss: 0.0010302980663254857:  59%|█████▉    | 191/325 [05:06<03:36,  1.62s/it]1|191|Loss: 0.0010302980663254857:  59%|█████▉    | 192/325 [05:07<03:29,  1.58s/it]1|192|Loss: 0.001030437182635069:  59%|█████▉    | 192/325 [05:07<03:29,  1.58s/it] 1|192|Loss: 0.001030437182635069:  59%|█████▉    | 193/325 [05:09<03:23,  1.54s/it]1|193|Loss: 0.0010309210047125816:  59%|█████▉    | 193/325 [05:09<03:23,  1.54s/it]1|193|Loss: 0.0010309210047125816:  60%|█████▉    | 194/325 [05:10<03:23,  1.56s/it]1|194|Loss: 0.001003446988761425:  60%|█████▉    | 194/325 [05:10<03:23,  1.56s/it] 1|194|Loss: 0.001003446988761425:  60%|██████    | 195/325 [05:12<03:22,  1.55s/it]1|195|Loss: 0.001098240027204156:  60%|██████    | 195/325 [05:12<03:22,  1.55s/it]1|195|Loss: 0.001098240027204156:  60%|██████    | 196/325 [05:13<03:24,  1.59s/it]1|196|Loss: 0.000992103829048574:  60%|██████    | 196/325 [05:13<03:24,  1.59s/it]1|196|Loss: 0.000992103829048574:  61%|██████    | 197/325 [05:15<03:21,  1.57s/it]1|197|Loss: 0.0010098563507199287:  61%|██████    | 197/325 [05:15<03:21,  1.57s/it]1|197|Loss: 0.0010098563507199287:  61%|██████    | 198/325 [05:16<03:18,  1.56s/it]1|198|Loss: 0.0009918726282194257:  61%|██████    | 198/325 [05:16<03:18,  1.56s/it]1|198|Loss: 0.0009918726282194257:  61%|██████    | 199/325 [05:18<03:18,  1.58s/it]1|199|Loss: 0.0009918827563524246:  61%|██████    | 199/325 [05:18<03:18,  1.58s/it]1|199|Loss: 0.0009918827563524246:  62%|██████▏   | 200/325 [05:20<03:14,  1.56s/it]1|200|Loss: 0.0010198806412518024:  62%|██████▏   | 200/325 [05:20<03:14,  1.56s/it]1|200|Loss: 0.0010198806412518024:  62%|██████▏   | 201/325 [05:21<03:08,  1.52s/it]1|201|Loss: 0.0010822961339727044:  62%|██████▏   | 201/325 [05:21<03:08,  1.52s/it]1|201|Loss: 0.0010822961339727044:  62%|██████▏   | 202/325 [05:22<03:03,  1.50s/it]1|202|Loss: 0.0010919230990111828:  62%|██████▏   | 202/325 [05:22<03:03,  1.50s/it]1|202|Loss: 0.0010919230990111828:  62%|██████▏   | 203/325 [05:24<02:58,  1.46s/it]1|203|Loss: 0.0010827600490301847:  62%|██████▏   | 203/325 [05:24<02:58,  1.46s/it]1|203|Loss: 0.0010827600490301847:  63%|██████▎   | 204/325 [05:25<02:59,  1.49s/it]1|204|Loss: 0.0010434295982122421:  63%|██████▎   | 204/325 [05:25<02:59,  1.49s/it]1|204|Loss: 0.0010434295982122421:  63%|██████▎   | 205/325 [05:27<03:12,  1.61s/it]1|205|Loss: 0.0010080175707116723:  63%|██████▎   | 205/325 [05:27<03:12,  1.61s/it]1|205|Loss: 0.0010080175707116723:  63%|██████▎   | 206/325 [05:29<03:04,  1.55s/it]1|206|Loss: 0.0010258910479024053:  63%|██████▎   | 206/325 [05:29<03:04,  1.55s/it]1|206|Loss: 0.0010258910479024053:  64%|██████▎   | 207/325 [05:31<03:11,  1.63s/it]1|207|Loss: 0.0009468393982388079:  64%|██████▎   | 207/325 [05:31<03:11,  1.63s/it]1|207|Loss: 0.0009468393982388079:  64%|██████▍   | 208/325 [05:32<03:07,  1.60s/it]1|208|Loss: 0.00100220728199929:  64%|██████▍   | 208/325 [05:32<03:07,  1.60s/it]  1|208|Loss: 0.00100220728199929:  64%|██████▍   | 209/325 [05:34<03:07,  1.61s/it]1|209|Loss: 0.0009881099686026573:  64%|██████▍   | 209/325 [05:34<03:07,  1.61s/it]1|209|Loss: 0.0009881099686026573:  65%|██████▍   | 210/325 [05:36<03:19,  1.73s/it]1|210|Loss: 0.0009871694492176175:  65%|██████▍   | 210/325 [05:36<03:19,  1.73s/it]1|210|Loss: 0.0009871694492176175:  65%|██████▍   | 211/325 [05:37<03:14,  1.70s/it]1|211|Loss: 0.0009838672121986747:  65%|██████▍   | 211/325 [05:37<03:14,  1.70s/it]1|211|Loss: 0.0009838672121986747:  65%|██████▌   | 212/325 [05:39<03:03,  1.63s/it]1|212|Loss: 0.0010463109938427806:  65%|██████▌   | 212/325 [05:39<03:03,  1.63s/it]1|212|Loss: 0.0010463109938427806:  66%|██████▌   | 213/325 [05:40<02:59,  1.60s/it]1|213|Loss: 0.0009847931796684861:  66%|██████▌   | 213/325 [05:40<02:59,  1.60s/it]1|213|Loss: 0.0009847931796684861:  66%|██████▌   | 214/325 [05:42<02:56,  1.59s/it]1|214|Loss: 0.0009852867806330323:  66%|██████▌   | 214/325 [05:42<02:56,  1.59s/it]1|214|Loss: 0.0009852867806330323:  66%|██████▌   | 215/325 [05:43<02:52,  1.57s/it]1|215|Loss: 0.0009395707747898996:  66%|██████▌   | 215/325 [05:43<02:52,  1.57s/it]1|215|Loss: 0.0009395707747898996:  66%|██████▋   | 216/325 [05:45<02:49,  1.56s/it]1|216|Loss: 0.0009526736102998257:  66%|██████▋   | 216/325 [05:45<02:49,  1.56s/it]1|216|Loss: 0.0009526736102998257:  67%|██████▋   | 217/325 [05:47<02:51,  1.59s/it]1|217|Loss: 0.0009581784252077341:  67%|██████▋   | 217/325 [05:47<02:51,  1.59s/it]1|217|Loss: 0.0009581784252077341:  67%|██████▋   | 218/325 [05:48<02:47,  1.56s/it]1|218|Loss: 0.0011184560135006905:  67%|██████▋   | 218/325 [05:48<02:47,  1.56s/it]1|218|Loss: 0.0011184560135006905:  67%|██████▋   | 219/325 [05:50<03:05,  1.75s/it]1|219|Loss: 0.0009873516391962767:  67%|██████▋   | 219/325 [05:50<03:05,  1.75s/it]1|219|Loss: 0.0009873516391962767:  68%|██████▊   | 220/325 [05:52<03:17,  1.88s/it]1|220|Loss: 0.0009543968481011689:  68%|██████▊   | 220/325 [05:52<03:17,  1.88s/it]1|220|Loss: 0.0009543968481011689:  68%|██████▊   | 221/325 [05:54<03:02,  1.76s/it]1|221|Loss: 0.0010468597756698728:  68%|██████▊   | 221/325 [05:54<03:02,  1.76s/it]1|221|Loss: 0.0010468597756698728:  68%|██████▊   | 222/325 [05:56<02:56,  1.71s/it]1|222|Loss: 0.0009246617555618286:  68%|██████▊   | 222/325 [05:56<02:56,  1.71s/it]1|222|Loss: 0.0009246617555618286:  69%|██████▊   | 223/325 [05:58<03:08,  1.85s/it]1|223|Loss: 0.0008838436915539205:  69%|██████▊   | 223/325 [05:58<03:08,  1.85s/it]1|223|Loss: 0.0008838436915539205:  69%|██████▉   | 224/325 [05:59<02:56,  1.75s/it]1|224|Loss: 0.0010163593105971813:  69%|██████▉   | 224/325 [05:59<02:56,  1.75s/it]1|224|Loss: 0.0010163593105971813:  69%|██████▉   | 225/325 [06:01<02:46,  1.67s/it]1|225|Loss: 0.001060906914062798:  69%|██████▉   | 225/325 [06:01<02:46,  1.67s/it] 1|225|Loss: 0.001060906914062798:  70%|██████▉   | 226/325 [06:02<02:41,  1.63s/it]1|226|Loss: 0.0009854115778580308:  70%|██████▉   | 226/325 [06:02<02:41,  1.63s/it]1|226|Loss: 0.0009854115778580308:  70%|██████▉   | 227/325 [06:04<02:40,  1.64s/it]1|227|Loss: 0.001013080938719213:  70%|██████▉   | 227/325 [06:04<02:40,  1.64s/it] 1|227|Loss: 0.001013080938719213:  70%|███████   | 228/325 [06:05<02:32,  1.57s/it]1|228|Loss: 0.0010050940327346325:  70%|███████   | 228/325 [06:05<02:32,  1.57s/it]1|228|Loss: 0.0010050940327346325:  70%|███████   | 229/325 [06:07<02:31,  1.57s/it]1|229|Loss: 0.000985056976787746:  70%|███████   | 229/325 [06:07<02:31,  1.57s/it] 1|229|Loss: 0.000985056976787746:  71%|███████   | 230/325 [06:09<02:30,  1.58s/it]1|230|Loss: 0.0009523763437755406:  71%|███████   | 230/325 [06:09<02:30,  1.58s/it]1|230|Loss: 0.0009523763437755406:  71%|███████   | 231/325 [06:10<02:27,  1.57s/it]1|231|Loss: 0.0010792057728394866:  71%|███████   | 231/325 [06:10<02:27,  1.57s/it]1|231|Loss: 0.0010792057728394866:  71%|███████▏  | 232/325 [06:12<02:29,  1.61s/it]1|232|Loss: 0.0010186503641307354:  71%|███████▏  | 232/325 [06:12<02:29,  1.61s/it]1|232|Loss: 0.0010186503641307354:  72%|███████▏  | 233/325 [06:13<02:22,  1.55s/it]1|233|Loss: 0.0010658162645995617:  72%|███████▏  | 233/325 [06:13<02:22,  1.55s/it]1|233|Loss: 0.0010658162645995617:  72%|███████▏  | 234/325 [06:15<02:20,  1.55s/it]1|234|Loss: 0.0010574995540082455:  72%|███████▏  | 234/325 [06:15<02:20,  1.55s/it]1|234|Loss: 0.0010574995540082455:  72%|███████▏  | 235/325 [06:16<02:17,  1.53s/it]1|235|Loss: 0.0009680026560090482:  72%|███████▏  | 235/325 [06:16<02:17,  1.53s/it]1|235|Loss: 0.0009680026560090482:  73%|███████▎  | 236/325 [06:18<02:13,  1.50s/it]1|236|Loss: 0.0010170843452215195:  73%|███████▎  | 236/325 [06:18<02:13,  1.50s/it]1|236|Loss: 0.0010170843452215195:  73%|███████▎  | 237/325 [06:19<02:15,  1.54s/it]1|237|Loss: 0.001088075339794159:  73%|███████▎  | 237/325 [06:19<02:15,  1.54s/it] 1|237|Loss: 0.001088075339794159:  73%|███████▎  | 238/325 [06:21<02:13,  1.54s/it]1|238|Loss: 0.001034494023770094:  73%|███████▎  | 238/325 [06:21<02:13,  1.54s/it]1|238|Loss: 0.001034494023770094:  74%|███████▎  | 239/325 [06:22<02:15,  1.57s/it]1|239|Loss: 0.0009920201264321804:  74%|███████▎  | 239/325 [06:22<02:15,  1.57s/it]1|239|Loss: 0.0009920201264321804:  74%|███████▍  | 240/325 [06:24<02:08,  1.51s/it]1|240|Loss: 0.0010585793061181903:  74%|███████▍  | 240/325 [06:24<02:08,  1.51s/it]1|240|Loss: 0.0010585793061181903:  74%|███████▍  | 241/325 [06:25<02:05,  1.49s/it]1|241|Loss: 0.0010194333735853434:  74%|███████▍  | 241/325 [06:25<02:05,  1.49s/it]1|241|Loss: 0.0010194333735853434:  74%|███████▍  | 242/325 [06:27<02:04,  1.50s/it]1|242|Loss: 0.0009560683974996209:  74%|███████▍  | 242/325 [06:27<02:04,  1.50s/it]1|242|Loss: 0.0009560683974996209:  75%|███████▍  | 243/325 [06:28<02:07,  1.56s/it]1|243|Loss: 0.0009742401889525354:  75%|███████▍  | 243/325 [06:28<02:07,  1.56s/it]1|243|Loss: 0.0009742401889525354:  75%|███████▌  | 244/325 [06:30<02:05,  1.55s/it]1|244|Loss: 0.0010487777180969715:  75%|███████▌  | 244/325 [06:30<02:05,  1.55s/it]1|244|Loss: 0.0010487777180969715:  75%|███████▌  | 245/325 [06:32<02:04,  1.55s/it]1|245|Loss: 0.0010089402785524726:  75%|███████▌  | 245/325 [06:32<02:04,  1.55s/it]1|245|Loss: 0.0010089402785524726:  76%|███████▌  | 246/325 [06:33<02:08,  1.63s/it]1|246|Loss: 0.0010204564314335585:  76%|███████▌  | 246/325 [06:33<02:08,  1.63s/it]1|246|Loss: 0.0010204564314335585:  76%|███████▌  | 247/325 [06:35<02:01,  1.56s/it]1|247|Loss: 0.0010619235690683126:  76%|███████▌  | 247/325 [06:35<02:01,  1.56s/it]1|247|Loss: 0.0010619235690683126:  76%|███████▋  | 248/325 [06:36<01:58,  1.54s/it]1|248|Loss: 0.0010111650917679071:  76%|███████▋  | 248/325 [06:36<01:58,  1.54s/it]1|248|Loss: 0.0010111650917679071:  77%|███████▋  | 249/325 [06:38<01:54,  1.51s/it]1|249|Loss: 0.0010241419076919556:  77%|███████▋  | 249/325 [06:38<01:54,  1.51s/it]1|249|Loss: 0.0010241419076919556:  77%|███████▋  | 250/325 [06:39<01:51,  1.48s/it]1|250|Loss: 0.0009780990658327937:  77%|███████▋  | 250/325 [06:39<01:51,  1.48s/it]1|250|Loss: 0.0009780990658327937:  77%|███████▋  | 251/325 [06:41<01:54,  1.55s/it]1|251|Loss: 0.0009831939823925495:  77%|███████▋  | 251/325 [06:41<01:54,  1.55s/it]1|251|Loss: 0.0009831939823925495:  78%|███████▊  | 252/325 [06:42<01:54,  1.57s/it]1|252|Loss: 0.0009444646420888603:  78%|███████▊  | 252/325 [06:42<01:54,  1.57s/it]1|252|Loss: 0.0009444646420888603:  78%|███████▊  | 253/325 [06:44<01:49,  1.52s/it]1|253|Loss: 0.0009949926752597094:  78%|███████▊  | 253/325 [06:44<01:49,  1.52s/it]1|253|Loss: 0.0009949926752597094:  78%|███████▊  | 254/325 [06:45<01:49,  1.55s/it]1|254|Loss: 0.0009676730842329562:  78%|███████▊  | 254/325 [06:45<01:49,  1.55s/it]1|254|Loss: 0.0009676730842329562:  78%|███████▊  | 255/325 [06:47<01:45,  1.51s/it]1|255|Loss: 0.0010029327822849154:  78%|███████▊  | 255/325 [06:47<01:45,  1.51s/it]1|255|Loss: 0.0010029327822849154:  79%|███████▉  | 256/325 [06:48<01:44,  1.51s/it]1|256|Loss: 0.0009684026008471847:  79%|███████▉  | 256/325 [06:48<01:44,  1.51s/it]1|256|Loss: 0.0009684026008471847:  79%|███████▉  | 257/325 [06:50<01:41,  1.50s/it]1|257|Loss: 0.001086078817024827:  79%|███████▉  | 257/325 [06:50<01:41,  1.50s/it] 1|257|Loss: 0.001086078817024827:  79%|███████▉  | 258/325 [06:51<01:39,  1.48s/it]1|258|Loss: 0.0009949886007234454:  79%|███████▉  | 258/325 [06:51<01:39,  1.48s/it]1|258|Loss: 0.0009949886007234454:  80%|███████▉  | 259/325 [06:53<01:36,  1.47s/it]1|259|Loss: 0.0009796825470402837:  80%|███████▉  | 259/325 [06:53<01:36,  1.47s/it]1|259|Loss: 0.0009796825470402837:  80%|████████  | 260/325 [06:54<01:38,  1.51s/it]1|260|Loss: 0.0010149592999368906:  80%|████████  | 260/325 [06:54<01:38,  1.51s/it]1|260|Loss: 0.0010149592999368906:  80%|████████  | 261/325 [06:56<01:45,  1.65s/it]1|261|Loss: 0.0009632548317313194:  80%|████████  | 261/325 [06:56<01:45,  1.65s/it]1|261|Loss: 0.0009632548317313194:  81%|████████  | 262/325 [06:58<01:42,  1.62s/it]1|262|Loss: 0.0010149328736588359:  81%|████████  | 262/325 [06:58<01:42,  1.62s/it]1|262|Loss: 0.0010149328736588359:  81%|████████  | 263/325 [06:59<01:37,  1.58s/it]1|263|Loss: 0.0009857011027634144:  81%|████████  | 263/325 [06:59<01:37,  1.58s/it]1|263|Loss: 0.0009857011027634144:  81%|████████  | 264/325 [07:01<01:34,  1.54s/it]1|264|Loss: 0.0010931234573945403:  81%|████████  | 264/325 [07:01<01:34,  1.54s/it]1|264|Loss: 0.0010931234573945403:  82%|████████▏ | 265/325 [07:03<01:35,  1.59s/it]1|265|Loss: 0.0009856981923803687:  82%|████████▏ | 265/325 [07:03<01:35,  1.59s/it]1|265|Loss: 0.0009856981923803687:  82%|████████▏ | 266/325 [07:04<01:36,  1.64s/it]1|266|Loss: 0.0009922496974468231:  82%|████████▏ | 266/325 [07:04<01:36,  1.64s/it]1|266|Loss: 0.0009922496974468231:  82%|████████▏ | 267/325 [07:06<01:31,  1.59s/it]1|267|Loss: 0.0010428277309983969:  82%|████████▏ | 267/325 [07:06<01:31,  1.59s/it]1|267|Loss: 0.0010428277309983969:  82%|████████▏ | 268/325 [07:07<01:32,  1.62s/it]1|268|Loss: 0.000997754279524088:  82%|████████▏ | 268/325 [07:07<01:32,  1.62s/it] 1|268|Loss: 0.000997754279524088:  83%|████████▎ | 269/325 [07:09<01:33,  1.66s/it]1|269|Loss: 0.0010627632727846503:  83%|████████▎ | 269/325 [07:09<01:33,  1.66s/it]1|269|Loss: 0.0010627632727846503:  83%|████████▎ | 270/325 [07:11<01:32,  1.67s/it]1|270|Loss: 0.0010630025062710047:  83%|████████▎ | 270/325 [07:11<01:32,  1.67s/it]1|270|Loss: 0.0010630025062710047:  83%|████████▎ | 271/325 [07:12<01:27,  1.63s/it]1|271|Loss: 0.0010221817065030336:  83%|████████▎ | 271/325 [07:12<01:27,  1.63s/it]1|271|Loss: 0.0010221817065030336:  84%|████████▎ | 272/325 [07:14<01:27,  1.64s/it]1|272|Loss: 0.0009340447722934186:  84%|████████▎ | 272/325 [07:14<01:27,  1.64s/it]1|272|Loss: 0.0009340447722934186:  84%|████████▍ | 273/325 [07:16<01:23,  1.61s/it]1|273|Loss: 0.0010351008968427777:  84%|████████▍ | 273/325 [07:16<01:23,  1.61s/it]1|273|Loss: 0.0010351008968427777:  84%|████████▍ | 274/325 [07:17<01:20,  1.57s/it]1|274|Loss: 0.0010293455561622977:  84%|████████▍ | 274/325 [07:17<01:20,  1.57s/it]1|274|Loss: 0.0010293455561622977:  85%|████████▍ | 275/325 [07:19<01:16,  1.53s/it]1|275|Loss: 0.001035827212035656:  85%|████████▍ | 275/325 [07:19<01:16,  1.53s/it] 1|275|Loss: 0.001035827212035656:  85%|████████▍ | 276/325 [07:20<01:14,  1.51s/it]1|276|Loss: 0.000997402472421527:  85%|████████▍ | 276/325 [07:20<01:14,  1.51s/it]1|276|Loss: 0.000997402472421527:  85%|████████▌ | 277/325 [07:22<01:12,  1.52s/it]1|277|Loss: 0.001047136727720499:  85%|████████▌ | 277/325 [07:22<01:12,  1.52s/it]1|277|Loss: 0.001047136727720499:  86%|████████▌ | 278/325 [07:23<01:13,  1.56s/it]1|278|Loss: 0.000977486022748053:  86%|████████▌ | 278/325 [07:23<01:13,  1.56s/it]1|278|Loss: 0.000977486022748053:  86%|████████▌ | 279/325 [07:25<01:13,  1.60s/it]1|279|Loss: 0.0009491657838225365:  86%|████████▌ | 279/325 [07:25<01:13,  1.60s/it]1|279|Loss: 0.0009491657838225365:  86%|████████▌ | 280/325 [07:27<01:16,  1.69s/it]1|280|Loss: 0.0009135460131801665:  86%|████████▌ | 280/325 [07:27<01:16,  1.69s/it]1|280|Loss: 0.0009135460131801665:  86%|████████▋ | 281/325 [07:28<01:12,  1.64s/it]1|281|Loss: 0.0010057882172986865:  86%|████████▋ | 281/325 [07:28<01:12,  1.64s/it]1|281|Loss: 0.0010057882172986865:  87%|████████▋ | 282/325 [07:30<01:16,  1.78s/it]1|282|Loss: 0.0009967171354219317:  87%|████████▋ | 282/325 [07:30<01:16,  1.78s/it]1|282|Loss: 0.0009967171354219317:  87%|████████▋ | 283/325 [07:32<01:11,  1.70s/it]1|283|Loss: 0.0010483537334948778:  87%|████████▋ | 283/325 [07:32<01:11,  1.70s/it]1|283|Loss: 0.0010483537334948778:  87%|████████▋ | 284/325 [07:33<01:07,  1.65s/it]1|284|Loss: 0.0010649405885487795:  87%|████████▋ | 284/325 [07:33<01:07,  1.65s/it]1|284|Loss: 0.0010649405885487795:  88%|████████▊ | 285/325 [07:35<01:03,  1.60s/it]1|285|Loss: 0.001024322584271431:  88%|████████▊ | 285/325 [07:35<01:03,  1.60s/it] 1|285|Loss: 0.001024322584271431:  88%|████████▊ | 286/325 [07:37<01:08,  1.76s/it]1|286|Loss: 0.00099642900750041:  88%|████████▊ | 286/325 [07:37<01:08,  1.76s/it] 1|286|Loss: 0.00099642900750041:  88%|████████▊ | 287/325 [07:38<01:02,  1.65s/it]1|287|Loss: 0.0010953443124890327:  88%|████████▊ | 287/325 [07:38<01:02,  1.65s/it]1|287|Loss: 0.0010953443124890327:  89%|████████▊ | 288/325 [07:40<01:00,  1.63s/it]1|288|Loss: 0.0010017376625910401:  89%|████████▊ | 288/325 [07:40<01:00,  1.63s/it]1|288|Loss: 0.0010017376625910401:  89%|████████▉ | 289/325 [07:42<00:56,  1.58s/it]1|289|Loss: 0.0009987539378926158:  89%|████████▉ | 289/325 [07:42<00:56,  1.58s/it]1|289|Loss: 0.0009987539378926158:  89%|████████▉ | 290/325 [07:44<01:05,  1.88s/it]1|290|Loss: 0.0009092183317989111:  89%|████████▉ | 290/325 [07:44<01:05,  1.88s/it]1|290|Loss: 0.0009092183317989111:  90%|████████▉ | 291/325 [07:46<01:06,  1.94s/it]1|291|Loss: 0.0009381675045005977:  90%|████████▉ | 291/325 [07:46<01:06,  1.94s/it]1|291|Loss: 0.0009381675045005977:  90%|████████▉ | 292/325 [07:48<01:01,  1.86s/it]1|292|Loss: 0.001029359526000917:  90%|████████▉ | 292/325 [07:48<01:01,  1.86s/it] 1|292|Loss: 0.001029359526000917:  90%|█████████ | 293/325 [07:49<00:55,  1.74s/it]1|293|Loss: 0.0009821892017498612:  90%|█████████ | 293/325 [07:49<00:55,  1.74s/it]1|293|Loss: 0.0009821892017498612:  90%|█████████ | 294/325 [07:51<00:51,  1.67s/it]1|294|Loss: 0.0009496003622189164:  90%|█████████ | 294/325 [07:51<00:51,  1.67s/it]1|294|Loss: 0.0009496003622189164:  91%|█████████ | 295/325 [07:52<00:49,  1.65s/it]1|295|Loss: 0.0010010154219344258:  91%|█████████ | 295/325 [07:52<00:49,  1.65s/it]1|295|Loss: 0.0010010154219344258:  91%|█████████ | 296/325 [07:54<00:46,  1.59s/it]1|296|Loss: 0.0010310040088370442:  91%|█████████ | 296/325 [07:54<00:46,  1.59s/it]1|296|Loss: 0.0010310040088370442:  91%|█████████▏| 297/325 [07:55<00:42,  1.52s/it]1|297|Loss: 0.0010553535539656878:  91%|█████████▏| 297/325 [07:55<00:42,  1.52s/it]1|297|Loss: 0.0010553535539656878:  92%|█████████▏| 298/325 [07:57<00:44,  1.66s/it]1|298|Loss: 0.0010034942533820868:  92%|█████████▏| 298/325 [07:57<00:44,  1.66s/it]1|298|Loss: 0.0010034942533820868:  92%|█████████▏| 299/325 [07:59<00:41,  1.60s/it]1|299|Loss: 0.00100443244446069:  92%|█████████▏| 299/325 [07:59<00:41,  1.60s/it]  1|299|Loss: 0.00100443244446069:  92%|█████████▏| 300/325 [08:00<00:40,  1.62s/it]1|300|Loss: 0.000992541084997356:  92%|█████████▏| 300/325 [08:00<00:40,  1.62s/it]1|300|Loss: 0.000992541084997356:  93%|█████████▎| 301/325 [08:02<00:37,  1.55s/it]1|301|Loss: 0.0010090144351124763:  93%|█████████▎| 301/325 [08:02<00:37,  1.55s/it]1|301|Loss: 0.0010090144351124763:  93%|█████████▎| 302/325 [08:03<00:36,  1.58s/it]1|302|Loss: 0.0010062518995255232:  93%|█████████▎| 302/325 [08:03<00:36,  1.58s/it]1|302|Loss: 0.0010062518995255232:  93%|█████████▎| 303/325 [08:05<00:34,  1.58s/it]1|303|Loss: 0.0009833796648308635:  93%|█████████▎| 303/325 [08:05<00:34,  1.58s/it]1|303|Loss: 0.0009833796648308635:  94%|█████████▎| 304/325 [08:06<00:32,  1.56s/it]1|304|Loss: 0.0010307542979717255:  94%|█████████▎| 304/325 [08:06<00:32,  1.56s/it]1|304|Loss: 0.0010307542979717255:  94%|█████████▍| 305/325 [08:08<00:30,  1.51s/it]1|305|Loss: 0.0010556579800322652:  94%|█████████▍| 305/325 [08:08<00:30,  1.51s/it]1|305|Loss: 0.0010556579800322652:  94%|█████████▍| 306/325 [08:09<00:28,  1.49s/it]1|306|Loss: 0.001016120659187436:  94%|█████████▍| 306/325 [08:09<00:28,  1.49s/it] 1|306|Loss: 0.001016120659187436:  94%|█████████▍| 307/325 [08:11<00:27,  1.50s/it]1|307|Loss: 0.000997203285805881:  94%|█████████▍| 307/325 [08:11<00:27,  1.50s/it]1|307|Loss: 0.000997203285805881:  95%|█████████▍| 308/325 [08:12<00:25,  1.49s/it]1|308|Loss: 0.0010010114638134837:  95%|█████████▍| 308/325 [08:12<00:25,  1.49s/it]1|308|Loss: 0.0010010114638134837:  95%|█████████▌| 309/325 [08:14<00:23,  1.48s/it]1|309|Loss: 0.0010100433137267828:  95%|█████████▌| 309/325 [08:14<00:23,  1.48s/it]1|309|Loss: 0.0010100433137267828:  95%|█████████▌| 310/325 [08:15<00:22,  1.53s/it]1|310|Loss: 0.0010235796216875315:  95%|█████████▌| 310/325 [08:15<00:22,  1.53s/it]1|310|Loss: 0.0010235796216875315:  96%|█████████▌| 311/325 [08:17<00:21,  1.53s/it]1|311|Loss: 0.0009609617991372943:  96%|█████████▌| 311/325 [08:17<00:21,  1.53s/it]1|311|Loss: 0.0009609617991372943:  96%|█████████▌| 312/325 [08:19<00:21,  1.65s/it]1|312|Loss: 0.000947886030189693:  96%|█████████▌| 312/325 [08:19<00:21,  1.65s/it] 1|312|Loss: 0.000947886030189693:  96%|█████████▋| 313/325 [08:21<00:20,  1.74s/it]1|313|Loss: 0.0009725608397275209:  96%|█████████▋| 313/325 [08:21<00:20,  1.74s/it]1|313|Loss: 0.0009725608397275209:  97%|█████████▋| 314/325 [08:22<00:17,  1.63s/it]1|314|Loss: 0.0010152863105759025:  97%|█████████▋| 314/325 [08:22<00:17,  1.63s/it]1|314|Loss: 0.0010152863105759025:  97%|█████████▋| 315/325 [08:24<00:15,  1.58s/it]1|315|Loss: 0.001006651553325355:  97%|█████████▋| 315/325 [08:24<00:15,  1.58s/it] 1|315|Loss: 0.001006651553325355:  97%|█████████▋| 316/325 [08:25<00:14,  1.59s/it]1|316|Loss: 0.0009569801040925086:  97%|█████████▋| 316/325 [08:25<00:14,  1.59s/it]1|316|Loss: 0.0009569801040925086:  98%|█████████▊| 317/325 [08:27<00:12,  1.59s/it]1|317|Loss: 0.0010360771557316184:  98%|█████████▊| 317/325 [08:27<00:12,  1.59s/it]1|317|Loss: 0.0010360771557316184:  98%|█████████▊| 318/325 [08:28<00:10,  1.57s/it]1|318|Loss: 0.0010062934597954154:  98%|█████████▊| 318/325 [08:28<00:10,  1.57s/it]1|318|Loss: 0.0010062934597954154:  98%|█████████▊| 319/325 [08:30<00:09,  1.54s/it]1|319|Loss: 0.001001165364868939:  98%|█████████▊| 319/325 [08:30<00:09,  1.54s/it] 1|319|Loss: 0.001001165364868939:  98%|█████████▊| 320/325 [08:32<00:07,  1.58s/it]1|320|Loss: 0.001051806379109621:  98%|█████████▊| 320/325 [08:32<00:07,  1.58s/it]1|320|Loss: 0.001051806379109621:  99%|█████████▉| 321/325 [08:33<00:06,  1.54s/it]1|321|Loss: 0.0010157617507502437:  99%|█████████▉| 321/325 [08:33<00:06,  1.54s/it]1|321|Loss: 0.0010157617507502437:  99%|█████████▉| 322/325 [08:34<00:04,  1.52s/it]1|322|Loss: 0.0010340127628296614:  99%|█████████▉| 322/325 [08:34<00:04,  1.52s/it]1|322|Loss: 0.0010340127628296614:  99%|█████████▉| 323/325 [08:36<00:03,  1.53s/it]1|323|Loss: 0.0009983681375160813:  99%|█████████▉| 323/325 [08:36<00:03,  1.53s/it]1|323|Loss: 0.0009983681375160813: 100%|█████████▉| 324/325 [08:38<00:01,  1.52s/it]1|324|Loss: 0.0010093094315379858: 100%|█████████▉| 324/325 [08:38<00:01,  1.52s/it]1|324|Loss: 0.0010093094315379858: 100%|██████████| 325/325 [08:39<00:00,  1.57s/it]1|325|Loss: 0.0010468644322827458: 100%|██████████| 325/325 [08:39<00:00,  1.57s/it]INFO:torchtune.utils._logging:Saving checkpoint. This may take some time. Retrieving full model state dict...
+[rank5]: Traceback (most recent call last):
+[rank5]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1114, in <module>
+[rank5]:     sys.exit(recipe_main())
+[rank5]:   File "/sgl-workspace/torchtune/torchtune/config/_parse.py", line 99, in wrapper
+[rank5]:     sys.exit(recipe_main(conf))
+[rank5]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1109, in recipe_main
+[rank5]:     recipe.train()
+[rank5]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1072, in train
+[rank5]:     self._checkpoint_client.save_checkpoint(
+[rank5]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 369, in save_checkpoint
+[rank5]:     self._save_checkpoint_sync(
+[rank5]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 244, in _save_checkpoint_sync
+[rank5]:     model_state_dict = training.gather_cpu_state_dict(
+[rank5]:   File "/sgl-workspace/torchtune/torchtune/training/_distributed.py", line 474, in gather_cpu_state_dict
+[rank5]:     param = param.full_tensor()
+[rank5]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 572, in full_tensor
+[rank5]:     redist_res = self.redistribute(
+[rank5]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 544, in redistribute
+[rank5]:     return Redistribute.apply(self, device_mesh, placements, async_op)
+[rank5]:   File "/usr/local/lib/python3.10/dist-packages/torch/autograd/function.py", line 575, in apply
+[rank5]:     return super().apply(*args, **kwargs)  # type: ignore[misc]
+[rank5]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 306, in forward
+[rank5]:     output = redistribute_local_tensor(
+[rank5]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 213, in redistribute_local_tensor
+[rank5]:     new_local_tensor = current_placement._to_replicate_tensor(
+[rank5]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/placement_types.py", line 244, in _to_replicate_tensor
+[rank5]:     result = funcol.all_gather_tensor(
+[rank5]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/_functional_collectives.py", line 205, in all_gather_tensor
+[rank5]:     tensor = torch.ops._c10d_functional.all_gather_into_tensor(
+[rank5]:   File "/usr/local/lib/python3.10/dist-packages/torch/_ops.py", line 1123, in __call__
+[rank5]:     return self._op(*args, **(kwargs or {}))
+[rank5]: RuntimeError: Backend nccl does not support allgather_into_tensor_coalesced
+[rank3]: Traceback (most recent call last):
+[rank3]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1114, in <module>
+[rank3]:     sys.exit(recipe_main())
+[rank3]:   File "/sgl-workspace/torchtune/torchtune/config/_parse.py", line 99, in wrapper
+[rank3]:     sys.exit(recipe_main(conf))
+[rank3]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1109, in recipe_main
+[rank3]:     recipe.train()
+[rank3]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1072, in train
+[rank3]:     self._checkpoint_client.save_checkpoint(
+[rank3]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 369, in save_checkpoint
+[rank3]:     self._save_checkpoint_sync(
+[rank3]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 244, in _save_checkpoint_sync
+[rank3]:     model_state_dict = training.gather_cpu_state_dict(
+[rank3]:   File "/sgl-workspace/torchtune/torchtune/training/_distributed.py", line 474, in gather_cpu_state_dict
+[rank3]:     param = param.full_tensor()
+[rank3]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 572, in full_tensor
+[rank3]:     redist_res = self.redistribute(
+[rank3]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 544, in redistribute
+[rank3]:     return Redistribute.apply(self, device_mesh, placements, async_op)
+[rank3]:   File "/usr/local/lib/python3.10/dist-packages/torch/autograd/function.py", line 575, in apply
+[rank3]:     return super().apply(*args, **kwargs)  # type: ignore[misc]
+[rank3]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 306, in forward
+[rank3]:     output = redistribute_local_tensor(
+[rank3]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 213, in redistribute_local_tensor
+[rank3]:     new_local_tensor = current_placement._to_replicate_tensor(
+[rank3]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/placement_types.py", line 244, in _to_replicate_tensor
+[rank3]:     result = funcol.all_gather_tensor(
+[rank3]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/_functional_collectives.py", line 205, in all_gather_tensor
+[rank3]:     tensor = torch.ops._c10d_functional.all_gather_into_tensor(
+[rank3]:   File "/usr/local/lib/python3.10/dist-packages/torch/_ops.py", line 1123, in __call__
+[rank3]:     return self._op(*args, **(kwargs or {}))
+[rank3]: RuntimeError: Backend nccl does not support allgather_into_tensor_coalesced
+[rank7]: Traceback (most recent call last):
+[rank7]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1114, in <module>
+[rank7]:     sys.exit(recipe_main())
+[rank7]:   File "/sgl-workspace/torchtune/torchtune/config/_parse.py", line 99, in wrapper
+[rank7]:     sys.exit(recipe_main(conf))
+[rank7]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1109, in recipe_main
+[rank7]:     recipe.train()
+[rank7]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1072, in train
+[rank7]:     self._checkpoint_client.save_checkpoint(
+[rank7]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 369, in save_checkpoint
+[rank7]:     self._save_checkpoint_sync(
+[rank7]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 244, in _save_checkpoint_sync
+[rank7]:     model_state_dict = training.gather_cpu_state_dict(
+[rank7]:   File "/sgl-workspace/torchtune/torchtune/training/_distributed.py", line 474, in gather_cpu_state_dict
+[rank7]:     param = param.full_tensor()
+[rank7]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 572, in full_tensor
+[rank7]:     redist_res = self.redistribute(
+[rank7]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 544, in redistribute
+[rank7]:     return Redistribute.apply(self, device_mesh, placements, async_op)
+[rank7]:   File "/usr/local/lib/python3.10/dist-packages/torch/autograd/function.py", line 575, in apply
+[rank7]:     return super().apply(*args, **kwargs)  # type: ignore[misc]
+[rank7]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 306, in forward
+[rank7]:     output = redistribute_local_tensor(
+[rank7]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 213, in redistribute_local_tensor
+[rank7]:     new_local_tensor = current_placement._to_replicate_tensor(
+[rank7]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/placement_types.py", line 244, in _to_replicate_tensor
+[rank7]:     result = funcol.all_gather_tensor(
+[rank7]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/_functional_collectives.py", line 205, in all_gather_tensor
+[rank7]:     tensor = torch.ops._c10d_functional.all_gather_into_tensor(
+[rank7]:   File "/usr/local/lib/python3.10/dist-packages/torch/_ops.py", line 1123, in __call__
+[rank7]:     return self._op(*args, **(kwargs or {}))
+[rank7]: RuntimeError: Backend nccl does not support allgather_into_tensor_coalesced
+[rank1]: Traceback (most recent call last):
+[rank1]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1114, in <module>
+[rank1]:     sys.exit(recipe_main())
+[rank1]:   File "/sgl-workspace/torchtune/torchtune/config/_parse.py", line 99, in wrapper
+[rank1]:     sys.exit(recipe_main(conf))
+[rank1]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1109, in recipe_main
+[rank1]:     recipe.train()
+[rank1]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1072, in train
+[rank1]:     self._checkpoint_client.save_checkpoint(
+[rank1]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 369, in save_checkpoint
+[rank1]:     self._save_checkpoint_sync(
+[rank1]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 244, in _save_checkpoint_sync
+[rank1]:     model_state_dict = training.gather_cpu_state_dict(
+[rank1]:   File "/sgl-workspace/torchtune/torchtune/training/_distributed.py", line 474, in gather_cpu_state_dict
+[rank1]:     param = param.full_tensor()
+[rank1]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 572, in full_tensor
+[rank1]:     redist_res = self.redistribute(
+[rank1]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 544, in redistribute
+[rank1]:     return Redistribute.apply(self, device_mesh, placements, async_op)
+[rank1]:   File "/usr/local/lib/python3.10/dist-packages/torch/autograd/function.py", line 575, in apply
+[rank1]:     return super().apply(*args, **kwargs)  # type: ignore[misc]
+[rank1]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 306, in forward
+[rank1]:     output = redistribute_local_tensor(
+[rank1]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 213, in redistribute_local_tensor
+[rank1]:     new_local_tensor = current_placement._to_replicate_tensor(
+[rank1]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/placement_types.py", line 244, in _to_replicate_tensor
+[rank1]:     result = funcol.all_gather_tensor(
+[rank1]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/_functional_collectives.py", line 205, in all_gather_tensor
+[rank1]:     tensor = torch.ops._c10d_functional.all_gather_into_tensor(
+[rank1]:   File "/usr/local/lib/python3.10/dist-packages/torch/_ops.py", line 1123, in __call__
+[rank1]:     return self._op(*args, **(kwargs or {}))
+[rank1]: RuntimeError: Backend nccl does not support allgather_into_tensor_coalesced
+[rank2]: Traceback (most recent call last):
+[rank2]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1114, in <module>
+[rank2]:     sys.exit(recipe_main())
+[rank2]:   File "/sgl-workspace/torchtune/torchtune/config/_parse.py", line 99, in wrapper
+[rank2]:     sys.exit(recipe_main(conf))
+[rank2]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1109, in recipe_main
+[rank2]:     recipe.train()
+[rank2]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1072, in train
+[rank2]:     self._checkpoint_client.save_checkpoint(
+[rank2]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 369, in save_checkpoint
+[rank2]:     self._save_checkpoint_sync(
+[rank2]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 244, in _save_checkpoint_sync
+[rank2]:     model_state_dict = training.gather_cpu_state_dict(
+[rank2]:   File "/sgl-workspace/torchtune/torchtune/training/_distributed.py", line 474, in gather_cpu_state_dict
+[rank2]:     param = param.full_tensor()
+[rank2]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 572, in full_tensor
+[rank2]:     redist_res = self.redistribute(
+[rank2]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 544, in redistribute
+[rank2]:     return Redistribute.apply(self, device_mesh, placements, async_op)
+[rank2]:   File "/usr/local/lib/python3.10/dist-packages/torch/autograd/function.py", line 575, in apply
+[rank2]:     return super().apply(*args, **kwargs)  # type: ignore[misc]
+[rank2]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 306, in forward
+[rank2]:     output = redistribute_local_tensor(
+[rank2]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 213, in redistribute_local_tensor
+[rank2]:     new_local_tensor = current_placement._to_replicate_tensor(
+[rank2]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/placement_types.py", line 244, in _to_replicate_tensor
+[rank2]:     result = funcol.all_gather_tensor(
+[rank2]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/_functional_collectives.py", line 205, in all_gather_tensor
+[rank2]:     tensor = torch.ops._c10d_functional.all_gather_into_tensor(
+[rank2]:   File "/usr/local/lib/python3.10/dist-packages/torch/_ops.py", line 1123, in __call__
+[rank2]:     return self._op(*args, **(kwargs or {}))
+[rank2]: RuntimeError: Backend nccl does not support allgather_into_tensor_coalesced
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1114, in <module>
+[rank0]:     sys.exit(recipe_main())
+[rank0]:   File "/sgl-workspace/torchtune/torchtune/config/_parse.py", line 99, in wrapper
+[rank0]:     sys.exit(recipe_main(conf))
+[rank0]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1109, in recipe_main
+[rank0]:     recipe.train()
+[rank0]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1072, in train
+[rank0]:     self._checkpoint_client.save_checkpoint(
+[rank0]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 369, in save_checkpoint
+[rank0]:     self._save_checkpoint_sync(
+[rank0]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 244, in _save_checkpoint_sync
+[rank0]:     model_state_dict = training.gather_cpu_state_dict(
+[rank0]:   File "/sgl-workspace/torchtune/torchtune/training/_distributed.py", line 474, in gather_cpu_state_dict
+[rank0]:     param = param.full_tensor()
+[rank0]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 572, in full_tensor
+[rank0]:     redist_res = self.redistribute(
+[rank0]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 544, in redistribute
+[rank0]:     return Redistribute.apply(self, device_mesh, placements, async_op)
+[rank0]:   File "/usr/local/lib/python3.10/dist-packages/torch/autograd/function.py", line 575, in apply
+[rank0]:     return super().apply(*args, **kwargs)  # type: ignore[misc]
+[rank0]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 306, in forward
+[rank0]:     output = redistribute_local_tensor(
+[rank0]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 213, in redistribute_local_tensor
+[rank0]:     new_local_tensor = current_placement._to_replicate_tensor(
+[rank0]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/placement_types.py", line 244, in _to_replicate_tensor
+[rank0]:     result = funcol.all_gather_tensor(
+[rank0]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/_functional_collectives.py", line 205, in all_gather_tensor
+[rank0]:     tensor = torch.ops._c10d_functional.all_gather_into_tensor(
+[rank0]:   File "/usr/local/lib/python3.10/dist-packages/torch/_ops.py", line 1123, in __call__
+[rank0]:     return self._op(*args, **(kwargs or {}))
+[rank0]: RuntimeError: Backend nccl does not support allgather_into_tensor_coalesced
+[rank4]: Traceback (most recent call last):
+[rank4]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1114, in <module>
+[rank4]:     sys.exit(recipe_main())
+[rank4]:   File "/sgl-workspace/torchtune/torchtune/config/_parse.py", line 99, in wrapper
+[rank4]:     sys.exit(recipe_main(conf))
+[rank4]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1109, in recipe_main
+[rank4]:     recipe.train()
+[rank4]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1072, in train
+[rank4]:     self._checkpoint_client.save_checkpoint(
+[rank4]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 369, in save_checkpoint
+[rank4]:     self._save_checkpoint_sync(
+[rank4]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 244, in _save_checkpoint_sync
+[rank4]:     model_state_dict = training.gather_cpu_state_dict(
+[rank4]:   File "/sgl-workspace/torchtune/torchtune/training/_distributed.py", line 474, in gather_cpu_state_dict
+[rank4]:     param = param.full_tensor()
+[rank4]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 572, in full_tensor
+[rank4]:     redist_res = self.redistribute(
+[rank4]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 544, in redistribute
+[rank4]:     return Redistribute.apply(self, device_mesh, placements, async_op)
+[rank4]:   File "/usr/local/lib/python3.10/dist-packages/torch/autograd/function.py", line 575, in apply
+[rank4]:     return super().apply(*args, **kwargs)  # type: ignore[misc]
+[rank4]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 306, in forward
+[rank4]:     output = redistribute_local_tensor(
+[rank4]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 213, in redistribute_local_tensor
+[rank4]:     new_local_tensor = current_placement._to_replicate_tensor(
+[rank4]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/placement_types.py", line 244, in _to_replicate_tensor
+[rank4]:     result = funcol.all_gather_tensor(
+[rank4]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/_functional_collectives.py", line 205, in all_gather_tensor
+[rank4]:     tensor = torch.ops._c10d_functional.all_gather_into_tensor(
+[rank4]:   File "/usr/local/lib/python3.10/dist-packages/torch/_ops.py", line 1123, in __call__
+[rank4]:     return self._op(*args, **(kwargs or {}))
+[rank4]: RuntimeError: Backend nccl does not support allgather_into_tensor_coalesced
+[rank6]: Traceback (most recent call last):
+[rank6]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1114, in <module>
+[rank6]:     sys.exit(recipe_main())
+[rank6]:   File "/sgl-workspace/torchtune/torchtune/config/_parse.py", line 99, in wrapper
+[rank6]:     sys.exit(recipe_main(conf))
+[rank6]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1109, in recipe_main
+[rank6]:     recipe.train()
+[rank6]:   File "/sgl-workspace/torchtune/recipes/full_finetune_distributed.py", line 1072, in train
+[rank6]:     self._checkpoint_client.save_checkpoint(
+[rank6]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 369, in save_checkpoint
+[rank6]:     self._save_checkpoint_sync(
+[rank6]:   File "/sgl-workspace/torchtune/torchtune/training/checkpointing/_checkpoint_client.py", line 244, in _save_checkpoint_sync
+[rank6]:     model_state_dict = training.gather_cpu_state_dict(
+[rank6]:   File "/sgl-workspace/torchtune/torchtune/training/_distributed.py", line 474, in gather_cpu_state_dict
+[rank6]:     param = param.full_tensor()
+[rank6]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 572, in full_tensor
+[rank6]:     redist_res = self.redistribute(
+[rank6]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_api.py", line 544, in redistribute
+[rank6]:     return Redistribute.apply(self, device_mesh, placements, async_op)
+[rank6]:   File "/usr/local/lib/python3.10/dist-packages/torch/autograd/function.py", line 575, in apply
+[rank6]:     return super().apply(*args, **kwargs)  # type: ignore[misc]
+[rank6]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 306, in forward
+[rank6]:     output = redistribute_local_tensor(
+[rank6]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/_redistribute.py", line 213, in redistribute_local_tensor
+[rank6]:     new_local_tensor = current_placement._to_replicate_tensor(
+[rank6]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/tensor/placement_types.py", line 244, in _to_replicate_tensor
+[rank6]:     result = funcol.all_gather_tensor(
+[rank6]:   File "/usr/local/lib/python3.10/dist-packages/torch/distributed/_functional_collectives.py", line 205, in all_gather_tensor
+[rank6]:     tensor = torch.ops._c10d_functional.all_gather_into_tensor(
+[rank6]:   File "/usr/local/lib/python3.10/dist-packages/torch/_ops.py", line 1123, in __call__
+[rank6]:     return self._op(*args, **(kwargs or {}))
+[rank6]: RuntimeError: Backend nccl does not support allgather_into_tensor_coalesced
+1|325|Loss: 0.0010468644322827458: 100%|██████████| 325/325 [08:39<00:00,  1.60s/it]
+W0527 06:52:48.895000 571677 torch/distributed/elastic/multiprocessing/api.py:897] Sending process 571976 closing signal SIGTERM
+W0527 06:52:48.896000 571677 torch/distributed/elastic/multiprocessing/api.py:897] Sending process 571978 closing signal SIGTERM
+W0527 06:52:48.896000 571677 torch/distributed/elastic/multiprocessing/api.py:897] Sending process 571979 closing signal SIGTERM
+W0527 06:52:48.896000 571677 torch/distributed/elastic/multiprocessing/api.py:897] Sending process 571980 closing signal SIGTERM
+W0527 06:52:48.896000 571677 torch/distributed/elastic/multiprocessing/api.py:897] Sending process 571981 closing signal SIGTERM
+W0527 06:52:48.896000 571677 torch/distributed/elastic/multiprocessing/api.py:897] Sending process 571982 closing signal SIGTERM
+W0527 06:52:48.897000 571677 torch/distributed/elastic/multiprocessing/api.py:897] Sending process 571983 closing signal SIGTERM
+E0527 06:52:49.963000 571677 torch/distributed/elastic/multiprocessing/api.py:869] failed (exitcode: 1) local_rank: 1 (pid: 571977) of binary: /usr/bin/python3
+Running with torchrun...
+Traceback (most recent call last):
+  File "/usr/local/bin/tune", line 8, in <module>
+    sys.exit(main())
+  File "/sgl-workspace/torchtune/torchtune/_cli/tune.py", line 52, in main
+    parser.run(args)
+  File "/sgl-workspace/torchtune/torchtune/_cli/tune.py", line 46, in run
+    args.func(args)
+  File "/sgl-workspace/torchtune/torchtune/_cli/run.py", line 212, in _run_cmd
+    self._run_distributed(args, is_builtin=is_builtin)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 355, in wrapper
+    return f(*args, **kwargs)
+  File "/sgl-workspace/torchtune/torchtune/_cli/run.py", line 101, in _run_distributed
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 909, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 138, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 269, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/sgl-workspace/torchtune/recipes/full_finetune_distributed.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-05-27_06:52:48
+  host      : g0574
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 571977)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
