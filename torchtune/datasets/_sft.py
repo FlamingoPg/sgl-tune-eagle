@@ -16,6 +16,18 @@ from torchtune.data._messages import validate_messages
 from torchtune.modules.transforms import Transform
 
 
+def remove_leading_gpt_messages(example):
+    """map函数：修改数据"""
+    conversations = example['conversations']
+    
+    # 找到第一个human消息
+    while conversations and conversations[0].get('from') == 'gpt':
+        conversations = conversations[1:]
+    
+    example['conversations'] = conversations
+    return example
+
+
 class SFTDataset(Dataset):
     """
     Primary class for creating any dataset for supervised fine-tuning either from
@@ -112,10 +124,12 @@ class SFTDataset(Dataset):
         self._model_transform = model_transform
 
         self._data = load_dataset(source, **load_dataset_kwargs)
+        
+        self._data = self._data.map(remove_leading_gpt_messages, load_from_cache_file=False, cache_file_name=None, desc="map")
         if filter_fn is not None:
             if filter_kwargs is None:
                 filter_kwargs = {}
-            self._data = self._data.filter(filter_fn, **filter_kwargs)
+            self._data = self._data.filter(filter_fn, **filter_kwargs, load_from_cache_file=False, cache_file_name=None, desc="filter")
 
         self._prepare_sample = SFTTransform(
             message_transform=self._message_transform,

@@ -43,16 +43,20 @@ resume_from_checkpoint: False
 
 # Dataset
 dataset:
-  _component_: torchtune.datasets.alpaca_dataset
+  _component_: torchtune.datasets.chat_dataset
+  source: Aeala/ShareGPT_Vicuna_unfiltered
+  conversation_column: conversations
+  conversation_style: sharegpt
   packed: False
+  split: train
 seed: null
 shuffle: True
 
 # Training arguments
-epochs: 1
+epochs: 10
 max_steps_per_epoch: null
-batch_size: 20
-gradient_accumulation_steps: 1 # Use to increase effective batch size
+batch_size: 2
+gradient_accumulation_steps: 8 # Use to increase effective batch size
 optimizer:
   _component_: torch.optim.AdamW
   lr: 2e-5
