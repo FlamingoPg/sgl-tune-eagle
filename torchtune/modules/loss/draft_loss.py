@@ -15,6 +15,20 @@ from torchtune.utils import get_logger
 log = get_logger()
 
 
+def top_accuracy(output, target, topk=(1,)):
+    """Computes the accuracy over the k top predictions for the specified values of k"""
+    with torch.no_grad():
+        maxk = max(topk)
+        _, pred = output.topk(maxk, -1, True, True)
+        pred = pred.t()
+        correct = pred.eq(target.view(1, -1).expand_as(pred))
+        res = []
+        for k in topk:
+            correct_k = correct[:k].reshape(-1).float().sum(0, keepdim=True)
+            res.append(correct_k.item())
+        return res
+
+
 class DraftLoss(nn.Module, SFTLoss):
     """Memory efficient Cross-entropy loss that incrementally computes loss for chunks of tokens
     by masking ignored tokens, calculating logits and then applying cross-entropy loss. Combines
@@ -44,6 +58,13 @@ class DraftLoss(nn.Module, SFTLoss):
         self.linear_projection = None
         self.num_output_chunks = num_output_chunks
         self.ignore_index = ignore_index
+        self.regression_loss_total = 0
+        self.classification_loss_total = 0
+        self.top_1_acc_sum = 0
+        self.top_2_acc_sum = 0
+        self.top_3_acc_sum = 0
+        self.logging_valid_token_count = 0
+        self.steps_since_last_logging = 0
 
     def set_model_output(self, model: nn.Module) -> None:
         """Modify model output to match the expected input for the loss function."""
@@ -93,6 +114,7 @@ class DraftLoss(nn.Module, SFTLoss):
             if isinstance(backbone_head_out, DTensor):
                 backbone_head_out = backbone_head_out.full_tensor()
             backbone_probs = nn.Softmax(dim=1)(backbone_head_out).detach()  # [num_valid, vocab_size]
+            _, target = torch.max(backbone_head_out, 1)
         
         # draft model logic
         draft_head_out = self.linear_projection(draft_output_hidden_states)  # [num_valid, vocab_size]  
@@ -115,6 +137,40 @@ class DraftLoss(nn.Module, SFTLoss):
         total_loss = (
             loss_reg + (0.1 * loss_class)
         )
+
+        # Calculate accuracy metrics
+        with torch.no_grad():
+            topkacc = top_accuracy(draft_head_out, target, (1, 2, 3))
+            valid_tokens = loss_mask.sum().item()
+            
+            self.regression_loss_total += loss_reg.item()
+            self.classification_loss_total += loss_class.item()
+            self.top_1_acc_sum += topkacc[0]
+            self.top_2_acc_sum += topkacc[1]
+            self.top_3_acc_sum += topkacc[2]
+            self.logging_valid_token_count += valid_tokens
+            self.steps_since_last_logging += 1
+
+            # Log metrics every 100 steps
+            if self.steps_since_last_logging % 100 == 0:
+                metrics = {
+                    "regression_loss": self.regression_loss_total / self.steps_since_last_logging,
+                    "classification_loss": self.classification_loss_total / self.steps_since_last_logging,
+                    "top_1_acc": self.top_1_acc_sum / self.logging_valid_token_count,
+                    "top_2_acc": self.top_2_acc_sum / self.logging_valid_token_count,
+                    "top_3_acc": self.top_3_acc_sum / self.logging_valid_token_count,
+                    "valid_token_count": self.logging_valid_token_count,
+                }
+                log.info(f"Metrics: {metrics}")
+                
+                # Reset counters
+                self.regression_loss_total = 0
+                self.classification_loss_total = 0
+                self.top_1_acc_sum = 0
+                self.top_2_acc_sum = 0
+                self.top_3_acc_sum = 0
+                self.logging_valid_token_count = 0
+                self.steps_since_last_logging = 0
 
         return total_loss
 
