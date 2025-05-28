@@ -55,8 +55,8 @@ shuffle: True
 # Training arguments
 epochs: 10
 max_steps_per_epoch: null
-batch_size: 2
-gradient_accumulation_steps: 8 # Use to increase effective batch size
+batch_size: 1
+gradient_accumulation_steps: 4 # Use to increase effective batch size
 optimizer:
   _component_: torch.optim.AdamW
   lr: 2e-5

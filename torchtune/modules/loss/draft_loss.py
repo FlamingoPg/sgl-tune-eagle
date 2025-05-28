@@ -136,8 +136,10 @@ class DraftLoss(nn.Module, SFTLoss):
             mask,
         )
 
-        if total_elements == 0:
-            # must return after calling compute_cross_entropy to not hang during data parallel training
-            return total_loss
-        else:
-            return total_loss / total_elements
+        return total_loss
+
+        # if total_elements == 0:
+        #     # must return after calling compute_cross_entropy to not hang during data parallel training
+        #     return total_loss
+        # else:
+        #     return total_loss / total_elements
