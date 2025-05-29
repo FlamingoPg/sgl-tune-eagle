@@ -123,7 +123,7 @@ class SFTDataset(Dataset):
         self._message_transform = message_transform
         self._model_transform = model_transform
 
-        self._data = load_dataset(source, **load_dataset_kwargs).select([0])
+        self._data = load_dataset(source, **load_dataset_kwargs)
         
         self._data = self._data.map(remove_leading_gpt_messages, load_from_cache_file=False, cache_file_name=None, desc="map")
         if filter_fn is not None:
