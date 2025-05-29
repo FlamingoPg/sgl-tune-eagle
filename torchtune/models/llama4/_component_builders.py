@@ -134,13 +134,7 @@ def llama4_draft_decoder(
             attn_dropout=attn_dropout,
         )
         
-        mlp_layer = llama4_moe(
-            dim=embed_dim,
-            hidden_dim=hidden_dim,
-            num_experts=num_experts,
-            experts_per_token=experts_per_token,
-            use_shared_expert=use_shared_expert,
-        )
+        mlp_layer = llama4_mlp(dim=embed_dim, hidden_dim=hidden_dim)
 
         layer = TransformerSelfAttentionLayer(
             attn=self_attn,
@@ -246,15 +240,15 @@ class EAGLE3DraftModel(nn.Module):
             layer.attn.v_proj.to_empty(device=device, recurse=recurse)
             layer.attn.output_proj.to_empty(device=device, recurse=recurse)
             
-            layer.mlp.router.gate.to_empty(device=device, recurse=recurse)
-            layer.mlp.experts.to_empty(device=device, recurse=recurse)
-            layer.mlp.shared_expert.w1.to_empty(device=device, recurse=recurse)
-            layer.mlp.shared_expert.w2.to_empty(device=device, recurse=recurse)
-            layer.mlp.shared_expert.w3.to_empty(device=device, recurse=recurse)
+            # layer.mlp.router.gate.to_empty(device=device, recurse=recurse)
+            # layer.mlp.experts.to_empty(device=device, recurse=recurse)
+            # layer.mlp.shared_expert.w1.to_empty(device=device, recurse=recurse)
+            # layer.mlp.shared_expert.w2.to_empty(device=device, recurse=recurse)
+            # layer.mlp.shared_expert.w3.to_empty(device=device, recurse=recurse)
             
-            # layer.mlp.w1.to_empty(device=device, recurse=recurse)
-            # layer.mlp.w2.to_empty(device=device, recurse=recurse)
-            # layer.mlp.w3.to_empty(device=device, recurse=recurse)
+            layer.mlp.w1.to_empty(device=device, recurse=recurse)
+            layer.mlp.w2.to_empty(device=device, recurse=recurse)
+            layer.mlp.w3.to_empty(device=device, recurse=recurse)
 
 
 
@@ -286,11 +280,15 @@ class EAGLE3DraftModel(nn.Module):
             nn.init.ones_(layer.sa_norm.scale)
             nn.init.ones_(layer.mlp_norm.scale)
             
-            layer.mlp.experts.reset_parameters()
-            layer.mlp.router.gate.reset_parameters()
-            layer.mlp.shared_expert.w1.reset_parameters()
-            layer.mlp.shared_expert.w2.reset_parameters()
-            layer.mlp.shared_expert.w3.reset_parameters()
+            # layer.mlp.experts.reset_parameters()
+            # layer.mlp.router.gate.reset_parameters()
+            # layer.mlp.shared_expert.w1.reset_parameters()
+            # layer.mlp.shared_expert.w2.reset_parameters()
+            # layer.mlp.shared_expert.w3.reset_parameters()
+            
+            layer.mlp.w1.reset_parameters()
+            layer.mlp.w2.reset_parameters()
+            layer.mlp.w3.reset_parameters()
             
 
     def forward(
@@ -327,13 +325,13 @@ class EAGLE3DraftModel(nn.Module):
         # 3. 特征与token embedding融合
         # [B, seq_len, 2*embed_dim] -> [B, seq_len, embed_dim]
         combined_input = torch.cat([input_embeds, fused_features], dim=-1)
-        projected_input = self.input_projection(combined_input)
+        # projected_input = self.input_projection(combined_input)
 
         # 4. Draft decoder前向传播
         draft_outputs = self.draft_decoder(
             tokens=None,
             mask=mask,
-            input_embeds=projected_input
+            input_embeds=combined_input
         )
 
         # 5. 输出投影
