@@ -210,8 +210,8 @@ def padded_collate_sft(
 
     Example:
         >>> token_pairs = [
-        >>>    {"tokens": [1, 2, 3], "labels": [4, 5, 6]},
-        >>>    {"tokens": [7,], "labels": [10,]},
+        >>>    {"tokens": [1, 2, 3], "labels": [4, 5, 6], "mask": [1, 1, 1]},
+        >>>    {"tokens": [7,], "labels": [10,], "mask": [1]},
         >>> ]
         >>> collated = padded_collate(
         >>>    batch=token_pairs,
@@ -222,6 +222,8 @@ def padded_collate_sft(
         >>> tensor([[1, 2, 3], [7, 0, 0]])
         >>> collated["labels"]
         >>> tensor([[4, 5, 6], [10, -100, -100]])
+        >>> collated["mask"]
+        >>> tensor([[1, 1, 1], [1, 0, 0]])
     """
     input_ids = pad_sequence(
         [torch.tensor(x["tokens"]) for x in batch],
@@ -234,19 +236,39 @@ def padded_collate_sft(
         padding_value=ignore_idx,
     )
 
+    # Handle mask if present in batch
+    if "mask" in batch[0]:
+        mask = pad_sequence(
+            [torch.tensor(x["mask"]) for x in batch],
+            batch_first=True,
+            padding_value=0,  # Use 0 for padding in mask
+        )
+    else:
+        # If no mask provided, create one based on labels
+        mask = (labels != ignore_idx).long()
+
     input_ids_seq_len = input_ids.shape[-1]
     labels_seq_len = labels.shape[-1]
+    mask_seq_len = mask.shape[-1]
 
     # Hack to pad correctly and not use max_seq_len, which is costly
     if input_ids_seq_len > labels_seq_len:
         labels = F.pad(
             labels, (0, input_ids_seq_len - labels_seq_len), value=ignore_idx
         )
+        mask = F.pad(
+            mask, (0, input_ids_seq_len - mask_seq_len), value=0
+        )
     elif labels_seq_len > input_ids_seq_len:
         input_ids = F.pad(
             input_ids,
             (0, labels_seq_len - input_ids_seq_len),
             value=padding_idx,
+        )
+        mask = F.pad(
+            mask,
+            (0, labels_seq_len - mask_seq_len),
+            value=0,
         )
 
     # Pad to multiple of N
@@ -261,13 +283,97 @@ def padded_collate_sft(
             (0, pad_to_multiple_of - (labels_seq_len % pad_to_multiple_of)),
             value=ignore_idx,
         )
-    batch_dict = {"tokens": input_ids.long(), "labels": labels.long()}
+        mask = F.pad(
+            mask,
+            (0, pad_to_multiple_of - (mask_seq_len % pad_to_multiple_of)),
+            value=0,
+        )
+
+    batch_dict = {
+        "tokens": input_ids.long(),
+        "labels": labels.long(),
+        "mask": mask.long(),
+    }
+
     if "encoder_input" in batch[0]:
         x = [x["encoder_input"] for x in batch]
         batched_encodings = _stack_encoder_input(x, new_dim=stack_on_new_dim)
         if batched_encodings != {}:
             batch_dict["encoder_input"] = batched_encodings
+
     return batch_dict
+
+
+def padded_collate_sft_with_mask(
+    batch: list[dict[str, Any]],
+    padding_idx: int = 0,
+    ignore_idx: int = CROSS_ENTROPY_IGNORE_IDX,
+    pad_to_multiple_of: int = 1,
+    stack_on_new_dim: bool = False,
+) -> dict[str, torch.Tensor]:
+    """Pad a batch of sequences to the longest sequence length in the batch, and
+    convert integer lists to tensors. Preserves the mask from ShareGPTToMessages.
+
+    Args:
+        batch (list[dict[str, Any]]): A list of dictionaries containing samples, including tokens, labels and mask.
+        padding_idx (int): Padding index for input ids. Defaults to 0.
+        ignore_idx (int): Padding index for labels. Defaults to -100.
+        pad_to_multiple_of (int): If > 1, pad the sequence to a multiple of this number.
+            This is useful for proper sharding with e.g. SequenceParallel.
+        stack_on_new_dim (bool): If True, stack any encoder tensors on a new dimension. Default is False
+
+    Returns:
+        dict[str, torch.Tensor]: Collated input, label and mask tensors.
+    """
+    input_ids = pad_sequence(
+        [torch.tensor(x["tokens"]) for x in batch],
+        batch_first=True,
+        padding_value=padding_idx,
+    )
+    labels = pad_sequence(
+        [torch.tensor(x["labels"]) for x in batch],
+        batch_first=True,
+        padding_value=ignore_idx,
+    )
+    # Preserve the original mask from ShareGPTToMessages
+    mask = pad_sequence(
+        [torch.tensor(x["mask"]) for x in batch],
+        batch_first=True,
+        padding_value=False,
+    )
+
+    # Pad to multiple of N
+    if pad_to_multiple_of > 1:
+        input_ids = F.pad(
+            input_ids,
+            (
+                0,
+                pad_to_multiple_of - (input_ids.size(1) % pad_to_multiple_of),
+            ),
+            value=padding_idx,
+        )
+        labels = F.pad(
+            labels,
+            (
+                0,
+                pad_to_multiple_of - (labels.size(1) % pad_to_multiple_of),
+            ),
+            value=ignore_idx,
+        )
+        mask = F.pad(
+            mask,
+            (
+                0,
+                pad_to_multiple_of - (mask.size(1) % pad_to_multiple_of),
+            ),
+            value=False,
+        )
+
+    return {
+        "tokens": input_ids,
+        "labels": labels,
+        "mask": mask,
+    }
 
 
 # TODO: Generalize this to support any type of encoder input, right now this assumes

@@ -10,6 +10,7 @@ from torchtune.data._collate import (
     padded_collate_dpo,
     padded_collate_packed,
     padded_collate_sft,
+    padded_collate_sft_with_mask,
     padded_collate_tiled_images_and_mask,
 )
 from torchtune.data._common import CROSS_ENTROPY_IGNORE_IDX
@@ -54,6 +55,7 @@ __all__ = [
     "QuestionAnswerTemplate",
     "ChatMLTemplate",
     "padded_collate_sft",
+    "padded_collate_sft_with_mask",
     "padded_collate_dpo",
     "left_pad_sequence",
     "padded_collate",
