@@ -87,7 +87,7 @@ def llama4_scout_17b_16e(
         num_heads=40,
         num_kv_heads=8,
         embed_dim=decoder_embed_dim,
-        intermediate_dim=8192,
+        intermediate_dim=4096,
         max_seq_len=10485760,
         rope_base=500_000,
         norm_eps=1e-5,
