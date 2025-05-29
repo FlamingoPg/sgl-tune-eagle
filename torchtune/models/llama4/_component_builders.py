@@ -123,7 +123,7 @@ def llama4_draft_decoder(
             num_heads=num_heads,
             num_kv_heads=num_kv_heads,
             head_dim=head_dim,
-            q_proj=nn.Linear(embed_dim, num_heads * head_dim, bias=False),
+            q_proj=nn.Linear(embed_dim * 2, num_heads * head_dim, bias=False),
             k_proj=nn.Linear(embed_dim, num_kv_heads * head_dim, bias=False),
             v_proj=nn.Linear(embed_dim, num_kv_heads * head_dim, bias=False),
             output_proj=nn.Linear(embed_dim, embed_dim, bias=False),
@@ -139,7 +139,7 @@ def llama4_draft_decoder(
         layer = TransformerSelfAttentionLayer(
             attn=self_attn,
             mlp=mlp_layer,
-            sa_norm=RMSNorm(dim=embed_dim, eps=norm_eps),
+            sa_norm=None,
             mlp_norm=RMSNorm(dim=embed_dim, eps=norm_eps),
             mask_mod=mask_mod,
         )
@@ -231,7 +231,6 @@ class EAGLE3DraftModel(nn.Module):
         
         for layer in self.draft_decoder.layers:
         
-            layer.sa_norm.to_empty(device=device, recurse=recurse)
             layer.mlp_norm.to_empty(device=device, recurse=recurse)
         
         
@@ -277,7 +276,6 @@ class EAGLE3DraftModel(nn.Module):
             layer.attn.v_proj.reset_parameters()
             layer.attn.output_proj.reset_parameters()
             
-            nn.init.ones_(layer.sa_norm.scale)
             nn.init.ones_(layer.mlp_norm.scale)
             
             # layer.mlp.experts.reset_parameters()

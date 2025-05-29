@@ -53,7 +53,7 @@ seed: null
 shuffle: True
 
 # Training arguments
-epochs: 10
+epochs: 1
 max_steps_per_epoch: null
 batch_size: 2
 gradient_accumulation_steps: 8 # Use to increase effective batch size
