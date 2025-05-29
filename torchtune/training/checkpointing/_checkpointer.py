@@ -798,7 +798,6 @@ class FullModelHFCheckpointer(_CheckpointerInterface):
                 )
             elif self._model_type == ModelType.LLAMA4:
                 from torchtune.models.llama4._convert_weights import llama4_tune_to_hf
-
                 state_dict[training.MODEL_KEY] = llama4_tune_to_hf(
                     state_dict[training.MODEL_KEY],
                 )
@@ -840,7 +839,18 @@ class FullModelHFCheckpointer(_CheckpointerInterface):
                 #       }
                 split_state_dicts: dict[str, dict[str, torch.Tensor]] = {}
                 total_size = 0
+                
+                max_shard = max(int(shard_id) for shard_id in self._weight_map.values())
+                new_shard_id = f"{max_shard + 1:04d}"  # 格式化为4位数字，如"0050"
+                
+                
                 for key, weight in state_dict[training.MODEL_KEY].items():
+                    
+                    if "draft" in key:
+                        self._weight_map.update({
+                            key: new_shard_id
+                        })
+                    
                     cpt_idx = self._weight_map[key]
 
                     # initialize dict

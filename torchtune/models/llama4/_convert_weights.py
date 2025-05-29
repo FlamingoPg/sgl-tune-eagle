@@ -221,7 +221,6 @@ def llama4_tune_to_hf(
 ) -> dict[str, torch.Tensor]:
     converted_state_dict = {}
     inverted_mapping_dict = {v: k for k, v in _FROM_HF.items()}
-
     for key, value in state_dict.items():
         # Handle special cases first
         if key in {
@@ -230,6 +229,9 @@ def llama4_tune_to_hf(
             "encoders.vision.projection.output.4.weight",
         }:
             new_key = inverted_mapping_dict[key]
+        elif key.startswith("draft"):
+            # Handle draft keys by removing the prefix
+            new_key = key
         elif key.endswith("experts.gate_proj"):
             # Combine gate projection with up projection
             new_key = get_mapped_key(key, inverted_mapping_dict)
