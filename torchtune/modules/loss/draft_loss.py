@@ -136,7 +136,7 @@ class DraftLoss(nn.Module, SFTLoss):
         )
         
         total_loss = (
-            loss_reg + (0.1 * loss_class)
+            loss_reg + (1 * loss_class)
         )
 
         # Calculate accuracy metrics
