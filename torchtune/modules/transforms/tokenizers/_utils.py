@@ -83,7 +83,7 @@ def tokenize_messages_no_special_tokens(
     bos_id: Optional[int] = None,
     eos_id: Optional[int] = None,
     truncation_type: str = "right",
-) -> tuple[list[int], list[bool]]:
+) -> tuple[list[int], list[bool], str, list[int]]:
     r"""Tokenize a list of messages one at a time then concatenate them,
     returning a list of tokens and a list of masks. Does not add any special
     tokens except for BOS and EOS (if provided). This serves as a common starting point for
@@ -96,12 +96,12 @@ def tokenize_messages_no_special_tokens(
         ...     Message(role="assistant", content="assistant response\n"),
         ... ]
         # tokenize_messages encodes messages separately and concats
-        >>> tokens = tokenize_messages_no_special_tokens(
+        >>> tokens, mask, formatted_conversation, offsets = tokenize_messages_no_special_tokens(
         ...     tokenizer,
         ...     messages,
         ...     bos_id=tokenizer.bos_id,
         ...     eos_id=tokenizer.eos_id,
-        ... )[0]
+        ... )
         >>> print(tokens)
         [1, 1788, 2643, 13, 1792, 9508, 13, 465, 22137, 2933, 2]
         # Same result as encoding the full string in one go
@@ -120,7 +120,7 @@ def tokenize_messages_no_special_tokens(
             Default is "right".
 
     Returns:
-        tuple[list[int], list[bool]]: The tokenized messages.
+        tuple[list[int], list[bool], str, list[int]]: The tokenized messages, mask, formatted conversation, and token offsets.
 
     Raises:
         RuntimeError: if any message in ``messages`` does not satisfy ``message['type'] == 'text'``.
@@ -131,6 +131,10 @@ def tokenize_messages_no_special_tokens(
     max_seq_len = tokenizer.max_seq_len  # We define this on ModelTokenizer
     tokenized_messages = []
     mask = []
+    formatted_conversation = ""
+    offsets = []
+    current_offset = 0
+
     for message in messages:
         # If assistant message, this is the end of a turn
         end_of_turn = message.role == "assistant"
@@ -139,6 +143,7 @@ def tokenize_messages_no_special_tokens(
         if start_of_turn and bos_id is not None:
             tokenized_messages.append(bos_id)
             mask.append(message.masked)
+            offsets.append(current_offset)
 
         # We want to trim leading whitespace on the next message when
         # (a) it is a continuation of the turn (i.e. not the first message)
@@ -151,12 +156,18 @@ def tokenize_messages_no_special_tokens(
         tokens = []
         for item in message.content:
             if item["type"] == "text":
+                content = item["content"].rstrip(" ")
+                formatted_conversation += content
                 tokens = tokens + tokenizer.encode(
-                    item["content"].rstrip(" "),
+                    content,
                     add_bos=False,
                     add_eos=False,
                     trim_leading_whitespace=trim_leading_whitespace,
                 )
+                # Add offset for each token
+                for _ in range(len(tokens)):
+                    offsets.append(current_offset)
+                current_offset += len(content)
             else:
                 raise RuntimeError(f"Unsupported message content type: {item['type']}")
         prev_ends_with_space = item["content"].endswith(" ")
@@ -168,28 +179,25 @@ def tokenize_messages_no_special_tokens(
             if eos_id is not None:
                 tokenized_messages.append(eos_id)
                 mask.append(message.masked)
+                offsets.append(current_offset)
             end_of_turn = False
             start_of_turn = True
         else:
             start_of_turn = False
 
         # Break out early if we reach max_seq_len
-        if max_seq_len is not None and len(tokenized_messages) >= max_seq_len:
+        if max_seq_len and len(tokenized_messages) >= max_seq_len:
             break
 
     # Finally, truncate if necessary
-    if max_seq_len is not None:
+    if max_seq_len:
         tokenized_messages = truncate(
-            tokenized_messages, max_seq_len, eos_id, truncation_type=truncation_type
+            tokenized_messages, max_seq_len, eos_id
         )
-        mask = truncate(
-            mask,
-            max_seq_len,
-            message.masked if eos_id is not None else None,
-            truncation_type=truncation_type,
-        )
+        mask = truncate(mask, max_seq_len, message.masked)
+        offsets = truncate(offsets, max_seq_len, current_offset)
 
-    return tokenized_messages, mask
+    return tokenized_messages, mask, formatted_conversation, offsets
 
 
 def parse_hf_tokenizer_json(tokenizer_json_path: str) -> dict[str, int]:

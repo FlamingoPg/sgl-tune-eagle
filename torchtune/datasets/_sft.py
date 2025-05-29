@@ -162,6 +162,16 @@ class SFTTransform(Transform):
             transformed_sample = self._message_transform(sample)
             if "messages" in transformed_sample:
                 validate_messages(transformed_sample["messages"])
+                # Store original text from messages
+                original_text = []
+                for msg in transformed_sample["messages"]:
+                    if isinstance(msg.content, str):
+                        original_text.append(msg.content)
+                    elif isinstance(msg.content, list):
+                        for item in msg.content:
+                            if isinstance(item, dict) and item.get("type") == "text":
+                                original_text.append(item["content"])
+                transformed_sample["original_text"] = original_text
         else:
             transformed_sample = sample
 
@@ -188,6 +198,10 @@ class SFTTransform(Transform):
             )
             tokenized_dict["labels"].append(CROSS_ENTROPY_IGNORE_IDX)
             assert len(tokenized_dict["tokens"]) == len(tokenized_dict["labels"])
+            
+            # Preserve original text in tokenized dict
+            if "original_text" in transformed_sample:
+                tokenized_dict["original_text"] = transformed_sample["original_text"]
         else:
             tokenized_dict = transformed_sample
 

@@ -262,6 +262,11 @@ def padded_collate_sft(
             value=ignore_idx,
         )
     batch_dict = {"tokens": input_ids.long(), "labels": labels.long()}
+    
+    # Preserve original text if available
+    if "original_text" in batch[0]:
+        batch_dict["original_text"] = [x["original_text"] for x in batch]
+        
     if "encoder_input" in batch[0]:
         x = [x["encoder_input"] for x in batch]
         batched_encodings = _stack_encoder_input(x, new_dim=stack_on_new_dim)

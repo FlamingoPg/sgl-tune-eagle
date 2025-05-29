@@ -8,6 +8,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 from torch.distributed.tensor import DTensor
+import re
 
 from torchtune.modules.loss.loss_types import SFTLoss
 from torchtune.utils import get_logger
@@ -48,16 +49,22 @@ class DraftLoss(nn.Module, SFTLoss):
         self,
         num_output_chunks: int = 8,
         ignore_index: int = -100,
+        assistant_header: str = "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+        user_header: str = "<|eot_id|><|start_header_id|>user<|end_header_id|>",
     ):
         super().__init__()
         """
         Args:
             num_output_chunks (int): Number of chunks to split the output tensor into. Default is 8.
             ignore_index (int): Index to ignore in the target tensor. Default is -100.
+            assistant_header (str): The header token sequence that marks the start of assistant responses.
+            user_header (str): The header token sequence that marks the start of user messages.
         """
         self.linear_projection = None
         self.num_output_chunks = num_output_chunks
         self.ignore_index = ignore_index
+        self.assistant_header = assistant_header
+        self.user_header = user_header
         self.regression_loss_total = 0
         self.classification_loss_total = 0
         self.top_1_acc_sum = 0
@@ -70,6 +77,39 @@ class DraftLoss(nn.Module, SFTLoss):
         """Modify model output to match the expected input for the loss function."""
         model.skip_output_layer = True
         self.linear_projection = model.output
+
+    def compute_assistant_mask(self, formatted_conversation: str, offsets: list) -> torch.Tensor:
+        """Compute loss mask for assistant responses in the conversation.
+        
+        Args:
+            formatted_conversation (str): The formatted conversation string
+            offsets (list): List of (start, end) character offsets for each token
+            
+        Returns:
+            torch.Tensor: Binary mask where 1 indicates tokens in assistant responses
+        """
+        loss_mask = torch.zeros(len(offsets), dtype=torch.long)
+        
+        # Find spans of assistant responses using regex
+        assistant_pattern = (
+            re.escape(self.assistant_header) + r"(.*?)(?=" + re.escape(self.user_header) + "|$)"
+        )
+        
+        for match in re.finditer(assistant_pattern, formatted_conversation, re.DOTALL):
+            # Assistant response text span (excluding assistant_header itself)
+            assistant_start_char = match.start(1)
+            assistant_end_char = match.end(1)
+            
+            # Mark tokens overlapping with assistant response
+            for idx, (token_start, token_end) in enumerate(offsets):
+                # Token is part of the assistant response span
+                if token_end <= assistant_start_char:
+                    continue  # token before assistant text
+                if token_start > assistant_end_char:
+                    continue  # token after assistant text
+                loss_mask[idx] = 1
+                
+        return loss_mask
 
     def compute_draft_loss(
         self,
@@ -179,12 +219,24 @@ class DraftLoss(nn.Module, SFTLoss):
         backbone_output_hidden_states: torch.Tensor,
         draft_output_hidden_states: torch.Tensor,
         targets: torch.Tensor,
+        formatted_conversation: str = None,
+        offsets: list = None,
     ) -> torch.Tensor:
-
-        # Total number of non-ignored tokens across the entire batch
-        mask = targets != self.ignore_index
-        total_elements = mask.sum()
-
+        """
+        Args:
+            backbone_output_hidden_states: Hidden states from the backbone model
+            draft_output_hidden_states: Hidden states from the draft model
+            targets: Target tokens
+            formatted_conversation: The formatted conversation string (required for assistant mask)
+            offsets: List of (start, end) character offsets for each token (required for assistant mask)
+        """
+        if formatted_conversation is None or offsets is None:
+            # Fallback to original mask if conversation info not provided
+            mask = targets != self.ignore_index
+        else:
+            # Compute mask based on assistant responses
+            mask = self.compute_assistant_mask(formatted_conversation, offsets)
+            
         # Compute cross-entropy loss for the chunks
         total_loss = self.compute_draft_loss(
             backbone_output_hidden_states,

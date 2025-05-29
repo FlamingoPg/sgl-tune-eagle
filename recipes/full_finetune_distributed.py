@@ -825,6 +825,8 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
     def _loss_step(self, batch: dict[str, torch.Tensor]) -> torch.Tensor:
         # Shape [b, s], needed for the loss not the model
         labels = batch.pop("labels")
+        # Get text information from batch
+        original_text = batch.pop("original_text", None)
 
         with self.activations_handling_ctx:
             outputs = self._model(**batch)
@@ -843,8 +845,8 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
             if isinstance(output_backbone, DTensor):
                 output_backbone = output_backbone.full_tensor()
 
-        # Compute loss
-        loss = self._loss_fn(output_backbone, output_draft, labels)
+        # Compute loss with text information
+        loss = self._loss_fn(output_backbone, output_draft, labels, formatted_conversation=original_text)
 
         # free logits otherwise it peaks backward memory
         del outputs
