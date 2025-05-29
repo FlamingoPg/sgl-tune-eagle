@@ -27,7 +27,7 @@ data_parallel_replicate_dim: 1
 tokenizer:
   _component_: torchtune.models.llama4.llama4_transform
   path: /tmp/Llama-4-Scout-17B-16E-Instruct/tokenizer.model
-  max_seq_len: null
+  max_seq_len: 2048
   max_num_tiles: 16
 
 checkpointer:
