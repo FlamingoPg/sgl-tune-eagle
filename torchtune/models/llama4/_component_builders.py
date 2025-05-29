@@ -207,7 +207,11 @@ class EAGLE3DraftModel(nn.Module):
             self.embed_dim
         )
 
-        # 3. Draft decoder（核心transformer层）
+        # 3. 添加RMSNorm层
+        self.input_embeds_norm = RMSNorm(dim=self.embed_dim, eps=self.norm_eps)
+        self.fused_features_norm = RMSNorm(dim=self.embed_dim, eps=self.norm_eps)
+
+        # 4. Draft decoder（核心transformer层）
         self.draft_decoder = llama4_draft_decoder(
             vocab_size=self.vocab_size,
             num_layers=self.num_layers,
@@ -226,6 +230,8 @@ class EAGLE3DraftModel(nn.Module):
     ):
         self.feature_fusion.to_empty(device=device, recurse=recurse)
         self.input_projection.to_empty(device=device, recurse=recurse)
+        self.input_embeds_norm.to_empty(device=device, recurse=recurse)
+        self.fused_features_norm.to_empty(device=device, recurse=recurse)
         
         self.draft_decoder.norm.to_empty(device=device, recurse=recurse)
         
@@ -263,6 +269,10 @@ class EAGLE3DraftModel(nn.Module):
         nn.init.xavier_uniform_(self.input_projection.weight)
         if self.input_projection.bias is not None:
             nn.init.zeros_(self.input_projection.bias)
+
+        # Initialize RMSNorm layers
+        nn.init.ones_(self.input_embeds_norm.scale)
+        nn.init.ones_(self.fused_features_norm.scale)
 
         nn.init.ones_(self.draft_decoder.norm.scale)
 
@@ -310,19 +320,23 @@ class EAGLE3DraftModel(nn.Module):
         # 降维到embed_dim [B, seq_len, embed_dim]
         fused_features = self.feature_fusion(concatenated_features)
 
-        # 2. 特征与token embedding融合
+        # 2. 对input_embeds和fused_features进行RMSNorm
+        input_embeds = self.input_embeds_norm(input_embeds)
+        fused_features = self.fused_features_norm(fused_features)
+
+        # 3. 特征与token embedding融合
         # [B, seq_len, 2*embed_dim] -> [B, seq_len, embed_dim]
         combined_input = torch.cat([input_embeds, fused_features], dim=-1)
         projected_input = self.input_projection(combined_input)
 
-        # 3. Draft decoder前向传播
+        # 4. Draft decoder前向传播
         draft_outputs = self.draft_decoder(
             tokens=None,
             mask=mask,
             input_embeds=projected_input
         )
 
-        # 4. 输出投影
+        # 5. 输出投影
         hidden_states = draft_outputs
 
         # return {
