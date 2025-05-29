@@ -15,7 +15,7 @@ from torchtune.modules.transforms.tokenizers import ModelTokenizer
 def filter_valid_conversations(example):
     """filter函数：只判断保留或丢弃"""
     conversations = example.get('conversations', [])
-    return (len(conversations) > 0 and 
+    return (len(conversations) > 1 and 
             conversations[0].get('from') == 'human')
 
 
