@@ -25,7 +25,7 @@ from torchdata.stateful_dataloader import StatefulDataLoader
 from torchdata.stateful_dataloader.sampler import StatefulDistributedSampler
 from torchtune import config, modules, training, utils
 from torchtune.config._utils import _get_component_from_path
-from torchtune.data import padded_collate_packed
+from torchtune.data import padded_collate_packed, padded_collate_sft_with_mask
 from torchtune.datasets import ConcatDataset
 from torchtune.modules.embedding_utils import resize_token_embeddings
 from torchtune.modules.loss import SFTLoss
@@ -808,7 +808,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
             sampler=sampler,
             collate_fn=(
                 partial(
-                    collate_fn,
+                    padded_collate_sft_with_mask,
                     padding_idx=self._tokenizer.pad_id,
                     ignore_idx=self._loss_fn.ignore_index,
                     pad_to_multiple_of=self.tp_degree,
@@ -825,6 +825,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
     def _loss_step(self, batch: dict[str, torch.Tensor]) -> torch.Tensor:
         # Shape [b, s], needed for the loss not the model
         labels = batch.pop("labels")
+        mask = batch.pop("mask")  # Get mask from batch
 
         with self.activations_handling_ctx:
             outputs = self._model(**batch)
@@ -843,8 +844,9 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
             if isinstance(output_backbone, DTensor):
                 output_backbone = output_backbone.full_tensor()
 
-        # Compute loss
-        loss = self._loss_fn(output_backbone, output_draft, labels)
+        # Compute loss with mask
+        # DraftLoss will handle the mask internally based on labels != ignore_index
+        loss = self._loss_fn(output_backbone, output_draft, labels, mask=mask)
 
         # free logits otherwise it peaks backward memory
         del outputs

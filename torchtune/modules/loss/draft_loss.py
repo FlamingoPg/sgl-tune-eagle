@@ -8,6 +8,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 from torch.distributed.tensor import DTensor
+from typing import Optional
 
 from torchtune.modules.loss.loss_types import SFTLoss
 from torchtune.utils import get_logger
@@ -179,10 +180,12 @@ class DraftLoss(nn.Module, SFTLoss):
         backbone_output_hidden_states: torch.Tensor,
         draft_output_hidden_states: torch.Tensor,
         targets: torch.Tensor,
+        mask: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
 
-        # Total number of non-ignored tokens across the entire batch
-        mask = targets != self.ignore_index
+        # Use provided mask if available, otherwise create mask from targets
+        if mask is None:
+            mask = targets != self.ignore_index
         total_elements = mask.sum()
 
         # Compute cross-entropy loss for the chunks
