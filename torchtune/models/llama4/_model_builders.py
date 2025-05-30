@@ -161,6 +161,19 @@ def llama4_maverick_17b_128e(
         skip_rope_interval=4,
         attention_chunk_size=8192,
     )
+
+    draft = llama4_draft_model(
+        vocab_size=202_048,
+        num_layers=1,
+        num_heads=40,
+        num_kv_heads=8,
+        embed_dim=decoder_embed_dim,
+        intermediate_dim=32768,
+        max_seq_len=1048576,
+        rope_base=500_000,
+        norm_eps=1e-5,
+    )
+
     return EarlyFusionModel(
         decoder,
         encoders={"vision": vision_encoder},
@@ -170,6 +183,7 @@ def llama4_maverick_17b_128e(
         encoders_trainable={
             "vision": encoder_trainable,
         },
+        draft=draft,
         decoder_trainable=decoder_trainable,
         fusion_trainable=fusion_trainable,
     )
