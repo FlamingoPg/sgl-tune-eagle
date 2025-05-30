@@ -324,7 +324,7 @@ class EAGLE3DraftModel(nn.Module):
         draft_outputs = self.draft_decoder(
             tokens=None,
             mask=mask,
-            input_embeds=combined_input
+            input_embeds=combined_input,
         )
 
         # 5. 输出投影
@@ -654,9 +654,9 @@ def llama4_decoder(
     output_proj = nn.Linear(embed_dim, vocab_size, bias=False)
     
     num_layers = len(layers)
-    low = 1
-    mid = num_layers // 2 - 1
-    high = num_layers - 4
+    low = num_layers // 4
+    mid = num_layers // 2 - 2
+    high = num_layers - 2
     output_hidden_states = [low, mid, high]
     
     return TransformerDecoder(
