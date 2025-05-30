@@ -43,12 +43,30 @@ resume_from_checkpoint: False
 
 # Dataset
 dataset:
-  _component_: torchtune.datasets.chat_dataset
-  source: Aeala/ShareGPT_Vicuna_unfiltered
-  conversation_column: conversations
-  conversation_style: sharegpt
-  packed: False
-  split: train
+  - _component_: torchtune.datasets.chat_dataset
+    source: Aeala/ShareGPT_Vicuna_unfiltered
+    conversation_column: conversations
+    conversation_style: sharegpt
+    packed: False
+    split: train
+  - _component_: torchtune.datasets.chat_dataset
+    source: HuggingFaceH4/ultrachat_200k
+    conversation_column: messages
+    conversation_style: openai
+    packed: False
+    split: train_sft
+  - _component_: torchtune.datasets.chat_dataset
+    source: HuggingFaceH4/ultrachat_200k
+    conversation_column: messages
+    conversation_style: openai
+    packed: False
+    split: train_gen
+  - _component_: torchtune.datasets.chat_dataset
+    source: Magpie-Align/Magpie-Llama-3.1-Pro-300K-Filtered
+    conversation_column: conversations
+    conversation_style: sharegpt
+    packed: False
+    split: train
 seed: null
 shuffle: True
 
@@ -59,12 +77,16 @@ batch_size: 2
 gradient_accumulation_steps: 8 # Use to increase effective batch size
 optimizer:
   _component_: torch.optim.AdamW
-  lr: 1e-4
+  lr: 5e-5
+  weight_decay: 0.0
+  betas: [0.9, 0.95]
   fused: False
 optimizer_in_bwd: False
 lr_scheduler:
   _component_: torchtune.training.lr_schedulers.get_cosine_schedule_with_warmup
-  num_warmup_steps: 100
+  num_warmup_steps: 600
+  num_training_steps: 6910
+  last_epoch: -1
 loss:
   _component_: torchtune.modules.loss.DraftLoss
 clip_grad_norm: null

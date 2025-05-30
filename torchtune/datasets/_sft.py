@@ -17,15 +17,27 @@ from torchtune.modules.transforms import Transform
 
 
 def remove_leading_gpt_messages(example):
-    """map函数：修改数据"""
-    conversations = example['conversations']
-    
-    # 找到第一个human消息
-    while conversations and conversations[0].get('from') == 'gpt':
-        conversations = conversations[1:]
-    
-    example['conversations'] = conversations
-    return example
+    """skip for openai style data"""
+    if 'conversations' not in example:
+        """map函数：修改数据"""
+        conversations = example['messages']
+        
+        # 找到第一个human消息
+        while conversations and conversations[0].get('role') == 'assistant':
+            conversations = conversations[1:]
+        
+        example['messages'] = conversations
+        return example
+    else:
+        """map函数：修改数据"""
+        conversations = example['conversations']
+        
+        # 找到第一个human消息
+        while conversations and conversations[0].get('from') == 'gpt':
+            conversations = conversations[1:]
+        
+        example['conversations'] = conversations
+        return example
 
 
 class SFTDataset(Dataset):
@@ -130,6 +142,8 @@ class SFTDataset(Dataset):
             if filter_kwargs is None:
                 filter_kwargs = {}
             self._data = self._data.filter(filter_fn, **filter_kwargs, load_from_cache_file=False, cache_file_name=None, desc="filter")
+
+        print(f"the dataset size after filter is {len(self._data)}")
 
         self._prepare_sample = SFTTransform(
             message_transform=self._message_transform,

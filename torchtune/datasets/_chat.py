@@ -14,9 +14,14 @@ from torchtune.modules.transforms.tokenizers import ModelTokenizer
 
 def filter_valid_conversations(example):
     """filter函数：只判断保留或丢弃"""
-    conversations = example.get('conversations', [])
-    return (len(conversations) > 1 and 
-            conversations[0].get('from') == 'human')
+    if 'conversations' not in example:
+        conversations = example.get('messages', [])
+        return (len(conversations) > 1 and 
+                conversations[0].get('role') == 'user')
+    else:
+        conversations = example.get('conversations', [])
+        return (len(conversations) > 1 and 
+                conversations[0].get('from') == 'human')
 
 
 def chat_dataset(
@@ -177,7 +182,7 @@ def chat_dataset(
     else:
         raise ValueError(f"Unsupported conversation style: {conversation_style}")
 
-    eagle3_filter = filter_valid_conversations if conversation_style == "sharegpt" else None
+    eagle3_filter = filter_valid_conversations
 
     if filter_fn is None:
         filter_fn = eagle3_filter
