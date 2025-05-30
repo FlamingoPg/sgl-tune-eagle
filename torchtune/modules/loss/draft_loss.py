@@ -114,14 +114,14 @@ class DraftLoss(nn.Module, SFTLoss):
             backbone_head_out = self.linear_projection(backbone_output_hidden_states)  # [num_valid, vocab_size]
             if isinstance(backbone_head_out, DTensor):
                 backbone_head_out = backbone_head_out.full_tensor()
-            backbone_probs = nn.Softmax(dim=1)(backbone_head_out).detach()  # [num_valid, vocab_size]
+            backbone_probs = nn.Softmax(dim=-1)(backbone_head_out).detach()  # [num_valid, vocab_size]
             _, target = torch.max(backbone_head_out, 1)
         
         # draft model logic
         draft_head_out = self.linear_projection(draft_output_hidden_states)  # [num_valid, vocab_size]  
         if isinstance(draft_head_out, DTensor):
             draft_head_out = draft_head_out.full_tensor()
-        draft_probs = nn.LogSoftmax(dim=1)(draft_head_out).detach()  # [num_valid, vocab_size]
+        draft_probs = nn.LogSoftmax(dim=-1)(draft_head_out)  # [num_valid, vocab_size]
         
         # loss_class = backbone_probs * draft_probs  # [num_valid, vocab_size]
         # loss_class = -torch.sum(torch.sum(loss_class, 1)) / (
@@ -138,7 +138,7 @@ class DraftLoss(nn.Module, SFTLoss):
         )
         
         total_loss = (
-            loss_reg + (1 * loss_class)
+            loss_class
         )
 
         # Calculate accuracy metrics
