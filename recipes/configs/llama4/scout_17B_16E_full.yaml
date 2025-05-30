@@ -43,7 +43,6 @@ resume_from_checkpoint: False
 
 # Dataset
 dataset:
-<<<<<<< HEAD
   # - _component_: torchtune.datasets.chat_dataset
   #   source: Aeala/ShareGPT_Vicuna_unfiltered
   #   conversation_column: conversations
@@ -68,25 +67,6 @@ dataset:
     conversation_style: sharegpt
     packed: False
     split: train
-=======
-  _component_: torchtune.datasets.chat_dataset
-  source: Aeala/ShareGPT_Vicuna_unfiltered
-  conversation_column: conversations
-  conversation_style: sharegpt
-  packed: False
-  split: train
-  _component_: torchtune.datasets.chat_dataset
-  source: HuggingFaceH4/ultrachat_200k
-  conversation_column: messages
-  conversation_style: openai
-  packed: False
-  _component_: torchtune.datasets.chat_dataset
-  source: Magpie-Align/Magpie-Llama-3.1-Pro-300K-Filtered
-  conversation_column: conversations
-  conversation_style: sharegpt
-  packed: False
-  split: train
->>>>>>> origin/eagle3_mlp
 seed: null
 shuffle: True
 
