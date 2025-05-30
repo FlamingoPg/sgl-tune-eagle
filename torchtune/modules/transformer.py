@@ -141,6 +141,133 @@ class TransformerSelfAttentionLayer(nn.Module):
         return out
 
 
+class TransformerDraftAttentionLayer(nn.Module):
+    """
+    Transformer layer derived from the Llama2 model. Normalization is applied before the attention **and** FF layer.
+
+    Args:
+        attn (MultiHeadAttention): Attention module.
+        mlp (nn.Module): Feed-forward module.
+        sa_norm (Optional[nn.Module]): Normalization to be applied before self-attention.
+        mlp_norm (Optional[nn.Module]): Normalization to be applied before the feed-forward layer.
+        sa_scale (Optional[nn.Module]): Module to scale self-attention output.
+        mlp_scale (Optional[nn.Module]): Module to scale the feed-forward output.
+        mask_mod (Optional[Callable[[_MaskType, int, int, int], _MaskType]]): A callable
+            taking a _MaskType, bsz, and seq_len, and modifying the mask (e.g. for chunked attention).
+    """
+
+    def __init__(
+        self,
+        attn: MultiHeadAttention,
+        mlp: nn.Module,
+        *,
+        sa_norm: Optional[nn.Module] = None,
+        mlp_norm: Optional[nn.Module] = None,
+        sa_scale: Optional[nn.Module] = None,
+        mlp_scale: Optional[nn.Module] = None,
+        mask_mod: Optional[Callable[[_MaskType, int, int, int], _MaskType]] = None,
+    ) -> None:
+        super().__init__()
+        self.attn = attn
+        self.mlp = mlp
+        self.sa_norm = sa_norm or nn.Identity()
+        self.mlp_norm = mlp_norm or nn.Identity()
+        self.sa_scale = sa_scale or nn.Identity()
+        self.mlp_scale = mlp_scale or nn.Identity()
+        self.mask_mod = mask_mod or None
+
+    def setup_caches(
+        self,
+        batch_size: int,
+        dtype: torch.dtype,
+        *,
+        encoder_max_seq_len: int,
+        decoder_max_seq_len: int,
+    ) -> None:
+        """Setup key value caches for attention calculation.
+
+        Args:
+            batch_size (int): batch size for the caches.
+            dtype (torch.dtype): dtype for the caches.
+            encoder_max_seq_len (int): this parameter is ignored in this layer.
+            decoder_max_seq_len (int): maximum cache sequence length.
+        """
+        self.attn.setup_cache(batch_size, dtype, max_seq_len=decoder_max_seq_len)
+
+    def caches_are_setup(self) -> bool:
+        """
+        Check if the key value caches are setup on ``self.attn``.
+        See :func:~torchtune.modules.TransformerDecoder.caches_are_setup`.
+        """
+        return self.attn.kv_cache is not None
+
+    def caches_are_enabled(self) -> bool:
+        """
+        Checks if the key value caches on ``self.attn`` are enabled.
+        See :func:~torchtune.modules.TransformerDecoder.caches_are_enabled`.
+        """
+        return self.attn.cache_enabled
+
+    def reset_cache(self):
+        """Reset the key value caches."""
+        self.attn.reset_cache()
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        *,
+        mask: Optional[_MaskType] = None,
+        input_pos: Optional[torch.Tensor] = None,
+        **kwargs: dict,
+    ) -> torch.Tensor:
+        """
+        Args:
+            x (torch.Tensor): input tensor with shape
+                [batch_size x seq_length x embed_dim]
+            mask (Optional[_MaskType]): Used to mask the scores after the query-key multiplication
+                and before the softmax. Either:
+
+                A boolean tensor with shape ``[b x s x s]``, ``[b x s x self.encoder_max_cache_seq_len]``,
+                or ``[b x s x self.encoder_max_cache_seq_len]`` if using KV-cacheing with encoder/decoder layers.
+                A value of True in row ``i`` and column ``j`` means token ``i`` attends to token ``j``. A value of False means
+                token ``i`` does not attend to token ``j``. If no mask is specified, a causal mask
+                is used by default.
+
+                A :class:`~torch.nn.attention.flex_attention.BlockMask` for document masking in a packed sequence
+                created via `create_block_mask <https://pytorch.org/blog/flexattention/#mask-mods>`_. We  use
+                :func:`~torch.nn.attention.flex_attention.flex_attention` when computing attention with block masks.
+                Default is None.
+            input_pos (Optional[torch.Tensor]): Optional tensor which contains the position ids
+                of each token. During training, this is used to indicate the positions
+                of each token relative to its sample when packed, shape [b x s].
+                During inference, this indicates the position of the current token.
+                If none, assume the index of the token is its position id. Default is None.
+            **kwargs (dict): transformer layer inputs not relevant to self attention.
+
+        Returns:
+            torch.Tensor: output tensor with same shape as input
+                [batch_size x seq_length x embed_dim]
+        """
+        # Input tensor and attention output have the same shape
+        # [b, s, d]
+        # Norm applied before self-attention
+        h = self.sa_norm(x)
+        if self.mask_mod is not None:
+            # With TP we need to use a replicated tensor here
+            bsz, seq_len, *_ = h.shape
+            mask = self.mask_mod(mask=mask, bsz=bsz, seq_len=seq_len)
+        attn_out = self.attn(h, h, mask=mask, input_pos=input_pos)
+        # Residual connection; shape: [batch_size, seq_length, embed_dim]
+        h = self.sa_scale(attn_out)
+
+        # Norm applied before the feedforward layer
+        mlp_out = self.mlp(self.mlp_norm(h))
+
+        # Residual connection; shape: [batch_size, seq_length, embed_dim]
+        out = self.mlp_scale(mlp_out)
+        return out
+
+
 class TransformerCrossAttentionLayer(nn.Module):
     """
     Cross attention Transformer layer following the same conventions as the TransformerSelfAttentionLayer.

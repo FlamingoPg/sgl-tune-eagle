@@ -31,6 +31,7 @@ from torchtune.modules import (
     RotaryPositionalEmbeddings,
     TransformerDecoder,
     TransformerSelfAttentionLayer,
+    TransformerDraftAttentionLayer
 )
 from torchtune.modules.common_utils import reparametrize_as_dtype_state_dict_post_hook
 from torchtune.modules.moe import (
@@ -124,8 +125,8 @@ def llama4_draft_decoder(
             num_kv_heads=num_kv_heads,
             head_dim=head_dim,
             q_proj=nn.Linear(embed_dim * 2, num_heads * head_dim, bias=False),
-            k_proj=nn.Linear(embed_dim, num_kv_heads * head_dim, bias=False),
-            v_proj=nn.Linear(embed_dim, num_kv_heads * head_dim, bias=False),
+            k_proj=nn.Linear(embed_dim * 2, num_kv_heads * head_dim, bias=False),
+            v_proj=nn.Linear(embed_dim * 2, num_kv_heads * head_dim, bias=False),
             output_proj=nn.Linear(embed_dim, embed_dim, bias=False),
             pos_embeddings=pos_embeddings,
             q_norm=q_norm,
@@ -136,7 +137,7 @@ def llama4_draft_decoder(
         
         mlp_layer = llama4_mlp(dim=embed_dim, hidden_dim=hidden_dim)
 
-        layer = TransformerSelfAttentionLayer(
+        layer = TransformerDraftAttentionLayer(
             attn=self_attn,
             mlp=mlp_layer,
             sa_norm=None,
@@ -195,11 +196,11 @@ class EAGLE3DraftModel(nn.Module):
             self.embed_dim
         )
 
-        # 2. 输入投影层（特征 + token embedding）
-        self.input_projection = nn.Linear(
-            self.embed_dim + self.embed_dim,  # fused_features + token_embedding
-            self.embed_dim
-        )
+        # # 2. 输入投影层（特征 + token embedding）
+        # self.input_projection = nn.Linear(
+        #     self.embed_dim + self.embed_dim,  # fused_features + token_embedding
+        #     self.embed_dim
+        # )
 
         # 3. 添加RMSNorm层
         self.input_embeds_norm = RMSNorm(dim=self.embed_dim, eps=self.norm_eps)
@@ -223,7 +224,6 @@ class EAGLE3DraftModel(nn.Module):
         self, *, device: Optional[Union[str, torch.device, int]], recurse: bool = True
     ):
         self.feature_fusion.to_empty(device=device, recurse=recurse)
-        self.input_projection.to_empty(device=device, recurse=recurse)
         self.input_embeds_norm.to_empty(device=device, recurse=recurse)
         self.fused_features_norm.to_empty(device=device, recurse=recurse)
         
@@ -257,11 +257,6 @@ class EAGLE3DraftModel(nn.Module):
         nn.init.xavier_uniform_(self.feature_fusion.weight)
         if self.feature_fusion.bias is not None:
             nn.init.zeros_(self.feature_fusion.bias)
-
-        # Initialize input projection layer
-        nn.init.xavier_uniform_(self.input_projection.weight)
-        if self.input_projection.bias is not None:
-            nn.init.zeros_(self.input_projection.bias)
 
         # Initialize RMSNorm layers
         nn.init.ones_(self.input_embeds_norm.scale)
@@ -659,9 +654,9 @@ def llama4_decoder(
     output_proj = nn.Linear(embed_dim, vocab_size, bias=False)
     
     num_layers = len(layers)
-    low = 2
-    mid = num_layers // 2
-    high = num_layers - 2
+    low = 1
+    mid = num_layers // 2 - 1
+    high = num_layers - 4
     output_hidden_states = [low, mid, high]
     
     return TransformerDecoder(

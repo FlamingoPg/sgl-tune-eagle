@@ -1,1 +1,2 @@
 prune tests  # Remove all testing files from final dist/
+tune run --nproc_per_node 8full_finetune_distributed --config llama4/scout_17B_16E_full > log 2>&1

@@ -31,6 +31,7 @@ from .transformer import (  # noqa
     TransformerCrossAttentionLayer,
     TransformerDecoder,
     TransformerSelfAttentionLayer,
+    TransformerDraftAttentionLayer
 )
 from .vision_transformer import VisionTransformer
 from .vq_embeddings import VectorQuantizedEmbeddings
@@ -52,6 +53,7 @@ __all__ = [
     "TransformerDecoder",
     "TransformerSelfAttentionLayer",
     "TransformerCrossAttentionLayer",
+    "TransformerDraftAttentionLayer",
     "reparametrize_as_dtype_state_dict_post_hook",
     "create_block_causal_mask",
     "packed_block_causal_mask",

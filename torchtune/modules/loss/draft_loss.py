@@ -123,10 +123,12 @@ class DraftLoss(nn.Module, SFTLoss):
             draft_head_out = draft_head_out.full_tensor()
         draft_probs = nn.LogSoftmax(dim=1)(draft_head_out).detach()  # [num_valid, vocab_size]
         
-        loss_class = backbone_probs * draft_probs  # [num_valid, vocab_size]
-        loss_class = -torch.sum(torch.sum(loss_class, 1)) / (
-            loss_mask.sum() + 1e-5
-        )
+        # loss_class = backbone_probs * draft_probs  # [num_valid, vocab_size]
+        # loss_class = -torch.sum(torch.sum(loss_class, 1)) / (
+        #     loss_mask.sum() + 1e-5
+        # )
+        loss_class = -torch.sum(backbone_probs * draft_probs, dim=-1)
+        loss_class = loss_class.sum() / (loss_mask.sum() + 1e-5)
         
         loss_reg = nn.SmoothL1Loss(reduction="none")(
             draft_output_hidden_states, backbone_output_hidden_states

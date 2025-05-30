@@ -59,9 +59,12 @@ batch_size: 2
 gradient_accumulation_steps: 8 # Use to increase effective batch size
 optimizer:
   _component_: torch.optim.AdamW
-  lr: 2e-5
+  lr: 1e-4
   fused: False
 optimizer_in_bwd: False
+lr_scheduler:
+  _component_: torchtune.training.lr_schedulers.get_cosine_schedule_with_warmup
+  num_warmup_steps: 100
 loss:
   _component_: torchtune.modules.loss.DraftLoss
 clip_grad_norm: null
