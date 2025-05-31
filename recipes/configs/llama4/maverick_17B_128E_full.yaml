@@ -25,7 +25,7 @@ data_parallel_replicate_dim: 1
 
 tokenizer:
   _component_: torchtune.models.llama4.llama4_transform
-  path: ${model_dir}/tokenizer.model
+  path: /tmp/Llama-4-Maverick-17B-128E-Instruct/tokenizer.model
   max_seq_len: 2048
   max_num_tiles: 16
 
