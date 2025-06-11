@@ -89,35 +89,20 @@ def llama4_draft_decoder(
     head_dim = embed_dim // num_heads
     num_kv_heads = num_kv_heads if num_kv_heads else num_heads
 
-    if use_scaled_rope:
-        rope = Llama4ScaledRoPE(
-            dim=head_dim,
-            max_seq_len=max_seq_len,
-            base=rope_base,
-            scale_factor=rope_scale_factor,
-            low_freq_factor=rope_low_freq_factor,
-            high_freq_factor=rope_high_freq_factor,
-            old_context_len=old_context_len,
-        )
-    else:
-        rope = RotaryPositionalEmbeddings(
-            dim=head_dim, max_seq_len=max_seq_len, base=rope_base
-        )
+    rope = Llama4ScaledRoPE(
+        dim=head_dim,
+        max_seq_len=max_seq_len,
+        base=rope_base,
+        scale_factor=rope_scale_factor,
+        low_freq_factor=rope_low_freq_factor,
+        high_freq_factor=rope_high_freq_factor,
+        old_context_len=old_context_len,
+    )
     layers = []
     for i in range(num_layers):
 
         mask_mod = None
-        if skip_rope_interval is not None and (i + 1) % skip_rope_interval != 0:
-            mask_mod = partial(
-                get_chunked_attention_mask, chunk_size=attention_chunk_size
-            )
-            # Note: this is the value in llama-models, which doesn't match the config
-            pos_embeddings = rope
-
-            q_norm = partial(rms_norm, eps=norm_eps) if use_qk_norm else None
-            k_norm = partial(rms_norm, eps=norm_eps) if use_qk_norm else None
-        else:
-            pos_embeddings, q_norm, k_norm = None, None, None
+        pos_embeddings, q_norm, k_norm = rope, None, None
 
         self_attn = MultiHeadAttention(
             embed_dim=embed_dim,
@@ -193,7 +178,8 @@ class EAGLE3DraftModel(nn.Module):
         # 1. 多层特征融合模块
         self.feature_fusion = nn.Linear(
             self.num_feature_layers * self.embed_dim,  # 融合多层特征
-            self.embed_dim
+            self.embed_dim,
+            bias=False
         )
 
         # # 2. 输入投影层（特征 + token embedding）
@@ -299,6 +285,8 @@ class EAGLE3DraftModel(nn.Module):
             token_embeddings: Token embeddings
             attention_mask: Attention mask
         """
+
+        print("input_embeds_norm.scale.requires_grad:", self.input_embeds_norm.scale.requires_grad)
 
         # 1. 融合多层特征
         feature_list = []

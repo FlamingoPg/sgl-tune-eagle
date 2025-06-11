@@ -128,7 +128,7 @@ class DraftLoss(nn.Module, SFTLoss):
         #     loss_mask.sum() + 1e-5
         # )
         loss_class = -torch.sum(backbone_probs * draft_probs, dim=-1)
-        loss_class = loss_class.sum() / (loss_mask.sum() + 1e-5)
+        loss_class = loss_class.mean()
         
         loss_reg = nn.SmoothL1Loss(reduction="none")(
             draft_output_hidden_states, backbone_output_hidden_states

@@ -846,7 +846,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
 
         # Compute loss with mask
         # DraftLoss will handle the mask internally based on labels != ignore_index
-        loss = self._loss_fn(output_backbone, output_draft, labels, mask=mask)
+        loss = self._loss_fn(output_backbone, output_draft, labels)
 
         # free logits otherwise it peaks backward memory
         del outputs
