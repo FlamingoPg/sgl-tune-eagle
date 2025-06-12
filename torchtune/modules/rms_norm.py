@@ -25,6 +25,9 @@ class RMSNorm(nn.Module):
         self.eps = eps
         self.scale = nn.Parameter(torch.ones(dim))
 
+    def reset_parameters(self) -> None:
+        nn.init.ones_(self.scale)
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Args:

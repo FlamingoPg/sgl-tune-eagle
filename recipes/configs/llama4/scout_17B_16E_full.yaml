@@ -44,7 +44,8 @@ resume_from_checkpoint: False
 # Dataset
 dataset:
   - _component_: torchtune.datasets.chat_dataset
-    source: Aeala/ShareGPT_Vicuna_unfiltered
+    source: json
+    data_files: /sgl-workspace/20250610_055345_1_data_start0_all.jsonl
     conversation_column: conversations
     conversation_style: sharegpt
     packed: False
@@ -84,7 +85,7 @@ optimizer:
 optimizer_in_bwd: False
 lr_scheduler:
   _component_: torchtune.training.lr_schedulers.get_cosine_schedule_with_warmup
-  num_warmup_steps: 100
+  num_warmup_steps: 1
   last_epoch: -1
 loss:
   _component_: torchtune.modules.loss.DraftLoss

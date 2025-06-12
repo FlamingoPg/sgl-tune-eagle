@@ -5,7 +5,6 @@
 # LICENSE file in the root directory of this source tree.
 
 import torch
-
 from functools import partial
 from typing import Optional, Union, List
 
@@ -244,11 +243,10 @@ class EAGLE3DraftModel(nn.Module):
         if self.feature_fusion.bias is not None:
             nn.init.zeros_(self.feature_fusion.bias)
 
+        self.input_embeds_norm.reset_parameters()
+        self.fused_features_norm.reset_parameters()
         # Initialize RMSNorm layers
-        nn.init.ones_(self.input_embeds_norm.scale)
-        nn.init.ones_(self.fused_features_norm.scale)
-
-        nn.init.ones_(self.draft_decoder.norm.scale)
+        self.draft_decoder.norm.reset_parameters()
 
         # Initialize draft decoder layers
         for layer in self.draft_decoder.layers:
@@ -257,13 +255,12 @@ class EAGLE3DraftModel(nn.Module):
             layer.attn.v_proj.reset_parameters()
             layer.attn.output_proj.reset_parameters()
             
-            nn.init.ones_(layer.mlp_norm.scale)
-            
             # layer.mlp.experts.reset_parameters()
             # layer.mlp.router.gate.reset_parameters()
             # layer.mlp.shared_expert.w1.reset_parameters()
             # layer.mlp.shared_expert.w2.reset_parameters()
             # layer.mlp.shared_expert.w3.reset_parameters()
+            layer.mlp_norm.reset_parameters()
             
             layer.mlp.w1.reset_parameters()
             layer.mlp.w2.reset_parameters()
@@ -285,8 +282,6 @@ class EAGLE3DraftModel(nn.Module):
             token_embeddings: Token embeddings
             attention_mask: Attention mask
         """
-
-        print("input_embeds_norm.scale.requires_grad:", self.input_embeds_norm.scale.requires_grad)
 
         # 1. 融合多层特征
         feature_list = []

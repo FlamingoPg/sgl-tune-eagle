@@ -54,6 +54,43 @@ from torchtune.training.quantization import (
 from tqdm import tqdm
 
 
+def check_draft_params_in_optimizer(optimizer, model):
+    """专门检查 draft 模块的参数是否在优化器中"""
+    
+    # 获取优化器中所有参数的ID
+    optimizer_param_ids = set()
+    for group in optimizer.param_groups:
+        for param in group['params']:
+            optimizer_param_ids.add(id(param))
+    
+    print("=== Draft Model Parameter Check ===")
+    draft_params_count = 0
+    draft_params_in_optimizer = 0
+    
+    for name, param in model.named_parameters():
+        if name.startswith('draft.') and 'scale' in name:
+            draft_params_count += 1
+            in_optimizer = id(param) in optimizer_param_ids
+            
+            if in_optimizer:
+                draft_params_in_optimizer += 1
+                status = "✓"
+            else:
+                status = "✗"
+            
+            print(f"{status} {name}")
+            print(f"    requires_grad: {param.requires_grad}")
+            print(f"    in_optimizer: {in_optimizer}")
+            print(f"    param_id: {id(param)}")
+    
+    print(f"\nSummary: {draft_params_in_optimizer}/{draft_params_count} draft scale params in optimizer")
+    
+    if draft_params_in_optimizer == 0:
+        print("🚨 WARNING: NO draft scale parameters found in optimizer!")
+    
+    return draft_params_in_optimizer == 0
+
+
 class FullFinetuneRecipeDistributed(FTRecipeInterface):
     """
     Full finetuning recipe for dense transformer-based LLMs such as Llama2. This recipe supports
@@ -901,6 +938,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
         """
         The core training loop.
         """
+        is_missing = check_draft_params_in_optimizer(self._optimizer, self._model)
         # clean up before training begins
         training.cleanup_before_training()
 
