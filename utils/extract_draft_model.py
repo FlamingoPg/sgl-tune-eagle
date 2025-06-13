@@ -57,7 +57,7 @@ def extract_draft_model(checkpoint_dir, output_dir):
     save_file(draft_state_dict, os.path.join(output_dir, "model.safetensors"))
 
     config = {
-        "architectures": ["LlamaForCausalLM"],
+        "architectures": ["LlamaForCausalLMEagle3"],
         "eagle_config": {
             "eagle_aux_hidden_state_layer_ids": [1, 23, 44],
             "use_aux_hidden_state": True,
@@ -67,6 +67,7 @@ def extract_draft_model(checkpoint_dir, output_dir):
         },
         "attention_bias": True,
         "model_type": "llama",
+        "draft_vocab_size": 202_048,
         "vocab_size": 202_048,
         "hidden_size": 5120,
         "num_hidden_layers": 1,
@@ -78,6 +79,8 @@ def extract_draft_model(checkpoint_dir, output_dir):
         "rope_theta": 500_000,
         "bos_token_id": 1,
         "eos_token_id": 2,
+        "tie_word_embeddings": False,
+        "torch_dtype": "bfloat16",
         "pad_token_id": 0,
     }
 
