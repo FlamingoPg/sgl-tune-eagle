@@ -21,7 +21,6 @@ def extract_draft_model(checkpoint_dir, output_dir):
         'draft_decoder.layers.0.mlp.w3.weight': 'midlayer.mlp.up_proj.weight',
         'draft_decoder.layers.0.mlp_norm.scale': 'midlayer.post_attention_layernorm.weight',
         'draft_decoder.norm.scale': 'norm.weight',
-        'feature_fusion.bias': 'fc.bias',
         'feature_fusion.weight': 'fc.weight',
         'input_embeds_norm.scale': 'midlayer.hidden_norm.weight',
         'fused_features_norm.scale': 'midlayer.input_layernorm.weight',
@@ -48,12 +47,6 @@ def extract_draft_model(checkpoint_dir, output_dir):
 
             draft_state_dict[new_key] = weight
 
-    if "feature_fusion.weight" not in draft_state_dict:
-        draft_state_dict["feature_fusion.weight"] = torch.nn.init.xavier_uniform_(
-            torch.empty(5120, 5120 * 3)
-        )
-        draft_state_dict["feature_fusion.bias"] = torch.zeros(5120)
-
     if "midlayer.input_layernorm.weight" not in draft_state_dict:
         draft_state_dict["midlayer.input_layernorm.weight"] = torch.ones(5120)
 
@@ -64,7 +57,7 @@ def extract_draft_model(checkpoint_dir, output_dir):
     save_file(draft_state_dict, os.path.join(output_dir, "model.safetensors"))
 
     config = {
-        "architectures": ["LlamaForCausalLM"],
+        "architectures": ["LlamaForCausalLMEagle3"],
         "eagle_config": {
             "eagle_aux_hidden_state_layer_ids": [1, 23, 44],
             "use_aux_hidden_state": True,
@@ -74,6 +67,7 @@ def extract_draft_model(checkpoint_dir, output_dir):
         },
         "attention_bias": True,
         "model_type": "llama",
+        "draft_vocab_size": 202_048,
         "vocab_size": 202_048,
         "hidden_size": 5120,
         "num_hidden_layers": 1,
@@ -85,6 +79,8 @@ def extract_draft_model(checkpoint_dir, output_dir):
         "rope_theta": 500_000,
         "bos_token_id": 1,
         "eos_token_id": 2,
+        "tie_word_embeddings": False,
+        "torch_dtype": "bfloat16",
         "pad_token_id": 0,
     }
 
