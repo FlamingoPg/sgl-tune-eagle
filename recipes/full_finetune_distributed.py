@@ -686,6 +686,37 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
                     m.rope_init()
 
 
+        param_mapping = {
+                'midlayer.self_attn.k_proj.weight': 'draft.draft_decoder.layers.0.attn.k_proj.weight',
+                'midlayer.self_attn.o_proj.weight': 'draft.draft_decoder.layers.0.attn.output_proj.weight',
+                'midlayer.self_attn.q_proj.weight': 'draft.draft_decoder.layers.0.attn.q_proj.weight',
+                'midlayer.self_attn.v_proj.weight': 'draft.draft_decoder.layers.0.attn.v_proj.weight',
+                'midlayer.mlp.gate_proj.weight': 'draft.draft_decoder.layers.0.mlp.w1.weight',
+                'midlayer.mlp.down_proj.weight': 'draft.draft_decoder.layers.0.mlp.w2.weight',
+                'midlayer.mlp.up_proj.weight': 'draft.draft_decoder.layers.0.mlp.w3.weight',
+                'midlayer.post_attention_layernorm.weight': 'draft.draft_decoder.layers.0.mlp_norm.scale',
+                'norm.weight': 'draft.draft_decoder.norm.scale',
+                'fc.weight': 'draft.feature_fusion.weight',
+                'midlayer.hidden_norm.weight': 'draft.input_embeds_norm.scale',
+                'midlayer.input_layernorm.weight': 'draft.fused_features_norm.scale',
+        }
+        # load draft model
+        from safetensors.torch import load_file
+        #
+        draft_path="/root/.cache/huggingface/hub/models--lukeysong--Llama-4-Scout-17B-16E-Eagle3/snapshots/11fea13c4edb2f18b5daea797a57ea0510337643/model.safetensors"
+        draft_path="/tmp/torchtune/llama4_17Bx16E/draft/model.safetensors"
+        # Load to CPU first, then move to target device
+        additional_state_dict = load_file(draft_path, device="cpu")
+
+        mapped_state_dict = {}
+        for old_key, new_key in param_mapping.items():
+            if old_key in additional_state_dict:
+                mapped_state_dict[new_key] = additional_state_dict[old_key].to(self._device)
+
+
+        # Update model_state_dict with mapped weights
+        model_state_dict.update(mapped_state_dict)
+
         # This method will convert the full model state dict into a sharded state
         # dict and load into the model
         training.load_from_full_model_state_dict(
@@ -693,6 +724,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
             model_state_dict,
             self._device,
             cpu_offload=fsdp_cpu_offload,
+            #strict=True,
         )
 
         # activation offloading
