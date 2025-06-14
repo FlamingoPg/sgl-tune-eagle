@@ -259,15 +259,25 @@ class TransformerDraftAttentionLayer(nn.Module):
             # With TP we need to use a replicated tensor here
             bsz, seq_len, *_ = h.shape
             mask = self.mask_mod(mask=mask, bsz=bsz, seq_len=seq_len)
+
         attn_out = self.attn(h, h, mask=mask, input_pos=input_pos)
+        if torch.cuda.current_device() == 0:
+            print("attn_out: ", attn_out)
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
         h = self.sa_scale(attn_out) + residual
-
+        if torch.cuda.current_device() == 0:
+            print("attn_out+residual: ", h)
+        h= self.mlp_norm(h)
+        if torch.cuda.current_device() == 0:
+            print("attn_out+norm: ", h)
         # Norm applied before the feedforward layer
-        mlp_out = self.mlp(self.mlp_norm(h))
-
+        mlp_out = self.mlp(h)
+        if torch.cuda.current_device() == 0:
+            print("mlp_out: ", mlp_out)
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
         out = h + self.mlp_scale(mlp_out)
+        if torch.cuda.current_device() == 0:
+            print("out = h + self.mlp_scale(mlp_out) out: ", out)
         return out
 
 

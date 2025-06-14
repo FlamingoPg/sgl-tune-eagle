@@ -98,6 +98,7 @@ class MultiHeadAttention(nn.Module):
         max_seq_len: int = 4096,
         is_causal: bool = True,
         attn_dropout: float = 0.0,
+        debug: bool = False,
     ) -> None:
         super().__init__()
         if num_heads % num_kv_heads != 0:
@@ -118,6 +119,7 @@ class MultiHeadAttention(nn.Module):
             raise ValueError("q and k norm must be set together")
 
         # Set attributes
+        self.debug = debug
         self.num_heads = num_heads
         self.num_kv_heads = num_kv_heads
         self.embed_dim = embed_dim
@@ -288,16 +290,35 @@ class MultiHeadAttention(nn.Module):
             expand_shape = (b, self.num_kv_heads, q_per_kv, -1, self.head_dim)
             k = k.unsqueeze(2).expand(expand_shape).flatten(1, 2)
             v = v.unsqueeze(2).expand(expand_shape).flatten(1, 2)
+        if torch.cuda.current_device() == 0 and self.debug:
+            import torch.nn.functional as F
+            out = F.scaled_dot_product_attention(
+                q,
+                k,
+                v,
+                attn_mask=mask,
+                dropout_p=0.0,
+                is_causal=True,
+            )
+            out = out.transpose(1, 2).contiguous().view(b, s_x, -1)
+            debug_q = q.transpose(1, 2).contiguous().view(b, s_x, -1)   
+            debug_k = k.transpose(1, 2).contiguous().view(b, s_y, -1)
+            debug_v = v.transpose(1, 2).contiguous().view(b, s_y, -1)
 
+            # Convert debug_q back to original Q shape
+            
+            print("q,k,v ",debug_q,debug_q.shape,debug_k,debug_k.shape,debug_v,debug_v.shape)
+            print("out ",out.shape,out)
         output = self._attention_call(
             q,
             k,
             v,
             mask=mask,
-            dropout_p=self.attn_dropout if self.training else 0.0,
-            is_causal=self.kv_cache is None and mask is None and self.is_causal,
+            dropout_p=0.0,
+            is_causal=True,
         )
-
         # reshape the output to be the same shape as the input
         output = output.transpose(1, 2).contiguous().view(b, s_x, -1)
+        if torch.cuda.current_device() == 0 and self.debug:
+            print("attn output no o: ",output.shape,output,mask)
         return self.output_proj(output)

@@ -48,6 +48,7 @@ class Llama4ScaledRoPE(nn.Module):
         low_freq_factor: Optional[float] = 1.0,
         high_freq_factor: Optional[float] = 1.0,
         old_context_len: Optional[int] = 8192,
+        debug: bool = False,
     ) -> None:
         super().__init__()
         self.dim = dim
@@ -59,8 +60,9 @@ class Llama4ScaledRoPE(nn.Module):
         self.high_freq_factor = high_freq_factor
         self.old_context_len = old_context_len
         self.is_cache_built = False
+        self.debug = debug
+        print("debug rope ",self.dim,self.base,self.max_seq_len,self.scale_factor,self.low_freq_factor,self.high_freq_factor,self.old_context_len)
         self.rope_init()
-
     def rope_init(self):
         """
         Warning: this is called in recipes before torch.compile,
@@ -100,6 +102,8 @@ class Llama4ScaledRoPE(nn.Module):
         # cache includes both the cos and sin components and so the output shape is
         # [max_seq_len, dim // 2, 2]
         cache = torch.stack([torch.cos(idx_theta), torch.sin(idx_theta)], dim=-1)
+        if torch.cuda.current_device() == 0 and self.debug:
+            print("debug cache ",torch.cos(idx_theta).shape,torch.cos(idx_theta))
         self.register_buffer("cache", cache, persistent=False)
 
     def apply_scaling(
@@ -125,6 +129,8 @@ class Llama4ScaledRoPE(nn.Module):
                     high_freq_factor - low_freq_factor
                 )
                 new_freqs.append((1 - smooth) * freq / scale_factor + smooth * freq)
+        if torch.cuda.current_device() == 0 and self.debug:
+            print("debug inv_freq: ",new_freqs)
         return torch.tensor(new_freqs, dtype=freqs.dtype, device=freqs.device)
 
     def forward(
@@ -165,7 +171,8 @@ class Llama4ScaledRoPE(nn.Module):
         rope_cache = (
             self.cache[:seq_len] if input_pos is None else self.cache[input_pos]
         )
-
+        if torch.cuda.current_device() == 0 and self.debug:
+            print("debug rope cache ",rope_cache.shape,rope_cache)
         # reshape input; the last dimension is used for computing the output.
         # Cast to float to match the reference implementation
         # tensor has shape [b, s, n_h, h_d // 2, 2]
@@ -189,4 +196,6 @@ class Llama4ScaledRoPE(nn.Module):
 
         # tensor has shape [b, s, n_h, h_d]
         x_out = x_out.flatten(3)
+        if torch.cuda.current_device() == 0 and self.debug:
+            print("debug x_out ",x_out.shape,x_out)
         return x_out.type_as(x)

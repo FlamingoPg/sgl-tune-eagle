@@ -96,6 +96,7 @@ def llama4_draft_decoder(
         low_freq_factor=rope_low_freq_factor,
         high_freq_factor=rope_high_freq_factor,
         old_context_len=old_context_len,
+        debug=True,
     )
     layers = []
     for i in range(num_layers):
@@ -117,6 +118,7 @@ def llama4_draft_decoder(
             k_norm=k_norm,
             max_seq_len=max_seq_len,
             attn_dropout=attn_dropout,
+            debug=True,
         )
         
         mlp_layer = llama4_mlp(dim=embed_dim, hidden_dim=hidden_dim)
@@ -188,6 +190,7 @@ class EAGLE3DraftModel(nn.Module):
         # )
 
         # 3. 添加RMSNorm层
+
         self.input_embeds_norm = RMSNorm(dim=self.embed_dim, eps=self.norm_eps)
         self.fused_features_norm = RMSNorm(dim=self.embed_dim, eps=self.norm_eps)
 
@@ -265,8 +268,6 @@ class EAGLE3DraftModel(nn.Module):
             layer.mlp.w1.reset_parameters()
             layer.mlp.w2.reset_parameters()
             layer.mlp.w3.reset_parameters()
-            
-
     def forward(
         self,
         tokens: torch.Tensor,
@@ -294,15 +295,18 @@ class EAGLE3DraftModel(nn.Module):
         # 降维到embed_dim [B, seq_len, embed_dim]
         fused_features = self.feature_fusion(concatenated_features)
 
+        
+        if torch.cuda.current_device() == 0:
+            print("input_embeds: ", input_embeds)
         # 2. 对input_embeds和fused_features进行RMSNorm
         input_embeds = self.input_embeds_norm(input_embeds)
         fused_features = self.fused_features_norm(fused_features)
-
         # 3. 特征与token embedding融合
         # [B, seq_len, 2*embed_dim] -> [B, seq_len, embed_dim]
         combined_input = torch.cat([input_embeds, fused_features], dim=-1)
         # projected_input = self.input_projection(combined_input)
-
+        if torch.cuda.current_device() == 0: 
+            print("combined_input: ", combined_input.shape,combined_input)
         # 4. Draft decoder前向传播
         draft_outputs = self.draft_decoder(
             tokens=None,
@@ -312,13 +316,16 @@ class EAGLE3DraftModel(nn.Module):
 
         # 5. 输出投影
         hidden_states = draft_outputs
-
+        if torch.cuda.current_device() == 0:
+            print("draft_outputs: ",hidden_states.shape,hidden_states)
         # return {
         #     'hidden_states': hidden_states,
         #     'logits': draft_outputs.logits,
         #     'past_key_values': draft_outputs.past_key_values if hasattr(draft_outputs, 'past_key_values') else None,
         #     'fused_features': fused_features,
         # }
+        import os
+        os.exit()
         return hidden_states
 
 
