@@ -103,7 +103,8 @@ class Llama4ScaledRoPE(nn.Module):
         # [max_seq_len, dim // 2, 2]
         cache = torch.stack([torch.cos(idx_theta), torch.sin(idx_theta)], dim=-1)
         if torch.cuda.current_device() == 0 and self.debug:
-            print("debug cache ",torch.cos(idx_theta).shape,torch.cos(idx_theta))
+            print("debug cache ",torch.cos(idx_theta).shape,torch.cos(idx_theta)[:3])
+            print("debug cache ",torch.sin(idx_theta).shape,torch.sin(idx_theta)[:3])
         self.register_buffer("cache", cache, persistent=False)
 
     def apply_scaling(
@@ -163,7 +164,8 @@ class Llama4ScaledRoPE(nn.Module):
             raise RuntimeError(
                 "RoPE cache is not built. Please call rope_init() first."
             )
-
+        if torch.cuda.current_device() == 0 and self.debug:
+            print("base q,k ",x.shape,x)
         # input tensor has shape [b, s, n_h, h_d]
         seq_len = x.size(1)
 
