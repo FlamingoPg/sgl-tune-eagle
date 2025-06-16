@@ -85,6 +85,8 @@ def qwen3_hf_to_tune(
         converted_state_dict[new_key] = value
     return converted_state_dict
 
+DECODER_PREFIX = "decoder."
+DECODER_PREFIX_LENGTH = len(DECODER_PREFIX)
 
 def qwen3_tune_to_hf(
     state_dict: dict[str, torch.Tensor],
@@ -117,7 +119,12 @@ def qwen3_tune_to_hf(
         head_dim = dim // num_heads
 
     for key, value in state_dict.items():
-        new_key = get_mapped_key(key, inverted_mapping_dict)
+        if key.startswith(DECODER_PREFIX):
+            key = key[DECODER_PREFIX_LENGTH:] # hack for qwen3 eagle, as we use an EarlyFusionModel instead of a TransformerDecoder
+        if key.startswith("draft"):
+            new_key = key
+        else:
+            new_key = get_mapped_key(key, inverted_mapping_dict)
         converted_state_dict[new_key] = value
         if QWEN3_TUNE_EMBEDDING_KEY in key and tie_word_embeddings:
             # If the model's input and output word embeddings are tied, we need to

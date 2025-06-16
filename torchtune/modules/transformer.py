@@ -252,7 +252,10 @@ class TransformerDraftAttentionLayer(nn.Module):
         # [b, s, d]
         # Norm applied before self-attention
         
-        residual = x[..., 5120:]
+        # Extract residual as the second half of input features
+        # Input is concatenated [input_embeds, fused_features] so residual is fused_features
+        embed_dim = x.shape[-1] // 2
+        residual = x[..., embed_dim:]
         
         h = self.sa_norm(x)
         if self.mask_mod is not None:
