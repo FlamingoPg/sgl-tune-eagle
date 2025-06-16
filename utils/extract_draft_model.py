@@ -65,10 +65,17 @@ def extract_draft_model(checkpoint_dir, output_dir):
             "use_last_layernorm": True,
             "use_mtp_layernorm": False
         },
-        "attention_bias": True,
+        "rope_scaling": {
+            "factor": 16.0,
+            "high_freq_factor": 1.0,
+            "low_freq_factor": 1.0,
+            "original_max_position_embeddings": 8192,
+            "rope_type": "llama3"
+        },
+        "attention_bias": False,
         "model_type": "llama",
-        "draft_vocab_size": 202_048,
-        "vocab_size": 202_048,
+        "draft_vocab_size": 202048,
+        "vocab_size": 202048,
         "hidden_size": 5120,
         "num_hidden_layers": 1,
         "num_attention_heads": 40,
