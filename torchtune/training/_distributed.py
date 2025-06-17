@@ -16,7 +16,7 @@ import torch
 import torch.distributed as dist
 from torch import nn
 
-from torch.distributed._composable.fsdp import CPUOffloadPolicy, fully_shard
+from torch.distributed._composable.fsdp import CPUOffloadPolicy, fully_shard, MixedPrecisionPolicy
 from torch.distributed._tensor import distribute_tensor, DTensor
 from torch.distributed._tensor.placement_types import DTensorSpec, TensorMeta
 from torch.distributed.checkpoint.state_dict import (
@@ -644,9 +644,9 @@ def shard_model(
         ValueError: If no layer modules were sharded, indicating that no shard_condition was triggered.
     """
     fsdp_kwargs = {"reshard_after_forward": reshard_after_forward, "mesh": dp_mesh}
+    
     if cpu_offload:
         fsdp_kwargs["offload_policy"] = CPUOffloadPolicy()
-
     # Shard the model with FSDP, iterating in reverse to start with
     # lowest-level modules first
     num_layers_sharded = 0

@@ -266,12 +266,12 @@ class TransformerDraftAttentionLayer(nn.Module):
         # h = self.sa_norm(x)
         if self.mask_mod is not None:
             # With TP we need to use a replicated tensor here
-            bsz, seq_len, *_ = h.shape
+            bsz, seq_len, *_ = hidden_states.shape
             mask = self.mask_mod(mask=mask, bsz=bsz, seq_len=seq_len)
         attn_out = self.attn(hidden_states, hidden_states, mask=mask, input_pos=input_pos)
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
         
-        residual += attn_out
+        residual = attn_out + residual
         h = self.post_attention_layernorm(residual)
         # print("post norm", self.post_attention_layernorm.scale)
 
@@ -279,7 +279,7 @@ class TransformerDraftAttentionLayer(nn.Module):
         mlp_out = self.mlp(h)
 
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
-        residual += mlp_out
+        residual = mlp_out + residual
         out = self.mlp_norm(residual)
         # print("mlp norm", self.mlp_norm.scale)
         
