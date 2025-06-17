@@ -48,7 +48,8 @@ dataset:
     conversation_column: conversations
     conversation_style: sharegpt
     packed: False
-    split: train
+    split: train[:25%]
+    new_system_prompt: "You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n\nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information."
   # - _component_: torchtune.datasets.chat_dataset
   #   source: json
   #   data_files: /sgl-workspace/20250610_055345_1_data_start0_all.jsonl
@@ -80,7 +81,7 @@ shuffle: True
 # Training arguments
 epochs: 1
 max_steps_per_epoch: null
-batch_size: 1
+batch_size: 2
 gradient_accumulation_steps: 8 # Use to increase effective batch size
 optimizer:
   _component_: torch.optim.AdamW
@@ -101,7 +102,7 @@ clip_grad_norm: null
 device: cuda
 
 # Memory management / performance
-enable_activation_checkpointing: False
+enable_activation_checkpointing: True
 enable_activation_offloading: False
 fsdp_cpu_offload: False
 # compile True means use torch.compile for all components
@@ -115,7 +116,7 @@ compile: False
 #    scale_grads: True
 
 # Reduced precision
-dtype: fp32
+dtype: bf16
 
 # Log metrics during training
 metric_logger:

@@ -71,6 +71,7 @@ class DraftLoss(nn.Module, SFTLoss):
         """Modify model output to match the expected input for the loss function."""
         model.skip_output_layer = True
         self.linear_projection = model.output
+        self.draft_linear_projection = model.draft.output_proj
 
     def compute_draft_loss(
         self,
@@ -114,14 +115,15 @@ class DraftLoss(nn.Module, SFTLoss):
             backbone_head_out = self.linear_projection(backbone_output_hidden_states)  # [num_valid, vocab_size]
             if isinstance(backbone_head_out, DTensor):
                 backbone_head_out = backbone_head_out.full_tensor()
-            backbone_probs = nn.Softmax(dim=-1)(backbone_head_out).detach()  # [num_valid, vocab_size]
+            backbone_probs = nn.Softmax(dim=-1)(backbone_head_out.float()).detach()  # [num_valid, vocab_size]
             _, target = torch.max(backbone_head_out, 1)
         
         # draft model logic
-        draft_head_out = self.linear_projection(draft_output_hidden_states)  # [num_valid, vocab_size]  
+        draft_head_out = self.draft_linear_projection(draft_output_hidden_states)  # [num_valid, vocab_size]  
         if isinstance(draft_head_out, DTensor):
             draft_head_out = draft_head_out.full_tensor()
-        draft_probs = nn.LogSoftmax(dim=-1)(draft_head_out)  # [num_valid, vocab_size]
+        print(draft_head_out.shape)
+        draft_probs = nn.LogSoftmax(dim=-1)(draft_head_out.float())  # [num_valid, vocab_size]
         
         # loss_class = backbone_probs * draft_probs  # [num_valid, vocab_size]
         # loss_class = -torch.sum(torch.sum(loss_class, 1)) / (

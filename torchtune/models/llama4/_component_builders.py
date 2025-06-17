@@ -128,7 +128,6 @@ def llama4_draft_decoder(
     layers = nn.ModuleList(layers)
 
     tok_embeddings = nn.Identity()
-    output_proj = nn.Identity()
     
     return layers
 
@@ -193,6 +192,8 @@ class EAGLE3DraftModel(nn.Module):
             norm_eps=self.norm_eps,
             attn_dropout=self.dropout,
         )
+        
+        self.output_proj = nn.Linear(embed_dim, vocab_size, bias=False)
 
     def to_empty(
         self, *, device: Optional[Union[str, torch.device, int]], recurse: bool = True
@@ -200,6 +201,8 @@ class EAGLE3DraftModel(nn.Module):
         self.feature_fusion.to_empty(device=device, recurse=recurse)
         
         # self.draft_decoder.norm.to_empty(device=device, recurse=recurse)
+        
+        self.output_proj.to_empty(device=device, recurse=recurse)
         
         for layer in self.draft_decoder:
         
@@ -230,9 +233,9 @@ class EAGLE3DraftModel(nn.Module):
     def initialize_parameters(self):
         """Initialize weights for the draft model."""
         # Initialize feature fusion layer
-        nn.init.xavier_uniform_(self.feature_fusion.weight)
-        if self.feature_fusion.bias is not None:
-            nn.init.zeros_(self.feature_fusion.bias)
+
+        self.feature_fusion.reset_parameters()
+        self.output_proj.reset_parameters()
 
         # Initialize RMSNorm layers
         # self.draft_decoder.norm.reset_parameters()

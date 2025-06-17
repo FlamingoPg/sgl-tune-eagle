@@ -271,16 +271,17 @@ class TransformerDraftAttentionLayer(nn.Module):
         attn_out = self.attn(hidden_states, hidden_states, mask=mask, input_pos=input_pos)
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
         
-        residual = attn_out + residual
-        h = self.post_attention_layernorm(residual)
+        hidden_states = attn_out + residual
+        residual = hidden_states
+        hidden_states = self.post_attention_layernorm(hidden_states)
         # print("post norm", self.post_attention_layernorm.scale)
 
         # Norm applied before the feedforward layer
-        mlp_out = self.mlp(h)
+        mlp_out = self.mlp(hidden_states)
 
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
-        residual = mlp_out + residual
-        out = self.mlp_norm(residual)
+        hidden_states = mlp_out + residual
+        out = self.mlp_norm(hidden_states)
         # print("mlp norm", self.mlp_norm.scale)
         
         return out

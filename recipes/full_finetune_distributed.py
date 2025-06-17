@@ -25,7 +25,7 @@ from torchdata.stateful_dataloader import StatefulDataLoader
 from torchdata.stateful_dataloader.sampler import StatefulDistributedSampler
 from torchtune import config, modules, training, utils
 from torchtune.config._utils import _get_component_from_path
-from torchtune.data import padded_collate_packed, padded_collate_sft_with_mask
+from torchtune.data import padded_collate_packed, padded_collate_sft_with_mask, padded_collate_sft
 from torchtune.datasets import ConcatDataset
 from torchtune.modules.embedding_utils import resize_token_embeddings
 from torchtune.modules.loss import SFTLoss
@@ -807,7 +807,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
             sampler=sampler,
             collate_fn=(
                 partial(
-                    padded_collate_sft_with_mask,
+                    padded_collate_sft,
                     padding_idx=self._tokenizer.pad_id,
                     ignore_idx=self._loss_fn.ignore_index,
                     pad_to_multiple_of=self.tp_degree,
@@ -824,7 +824,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
     def _loss_step(self, batch: dict[str, torch.Tensor]) -> torch.Tensor:
         # Shape [b, s], needed for the loss not the model
         labels = batch.pop("labels")
-        mask = batch.pop("mask")  # Get mask from batch
+        mask = batch.pop("mask")
 
         with self.activations_handling_ctx:
             outputs = self._model(**batch)
@@ -845,7 +845,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
 
         # Compute loss with mask
         # DraftLoss will handle the mask internally based on labels != ignore_index
-        loss = self._loss_fn(output_backbone, output_draft, labels)
+        loss = self._loss_fn(output_backbone, output_draft, labels, mask=mask)
 
         # free logits otherwise it peaks backward memory
         del outputs
@@ -976,90 +976,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
                             # If sharded, collect the DTensor here
                             if isinstance(grad_norm, DTensor):
                                 grad_norm = grad_norm.full_tensor()
-                        print(f"\n=== Step - Before Optimizer Step ===")
-    
-                        for name, param in self._model.named_parameters():
-                            if 'draft' in name and 'input_layernorm.scale' in name:  # 只检查一个代表性的
-                                print(f"{name}:")
-                                
-                                # 处理分布式张量
-                                try:
-                                    if hasattr(param, 'to_local'):
-                                        # DTensor - 转换为本地张量
-                                        local_param = param.to_local()
-                                        local_grad = param.grad.to_local() if param.grad is not None else None
-                                        print(f"  Using DTensor.to_local()")
-                                    else:
-                                        # 普通张量
-                                        local_param = param.data
-                                        local_grad = param.grad
-                                    
-                                    # 安全地获取第一个元素
-                                    if local_param.numel() > 0:
-                                        first_val = local_param.flatten()[0].item()
-                                        print(f"  Current value[0]: {first_val:.10f}")
-                                        print(f"  Tensor shape: {local_param.shape}")
-                                        print(f"  Mean: {local_param.mean().item():.10f}")
-                                        print(f"  Std: {local_param.std().item():.10f}")
-                                    else:
-                                        print(f"  Empty tensor on this rank")
-                                        continue
-                                    
-                                    print(f"  Has grad: {param.grad is not None}")
-                                    
-                                    if param.grad is not None and local_grad.numel() > 0:
-                                        grad_first = local_grad.flatten()[0].item()
-                                        grad_norm = local_grad.norm().item()
-                                        print(f"  Grad[0]: {grad_first:.10f}")
-                                        print(f"  Grad norm: {grad_norm:.6f}")
-                                        
-                                        # 计算预期更新
-                                        lr = 1e-4  # 你的学习率
-                                        expected_update = lr * grad_first
-                                        print(f"  Expected update: {expected_update:.10f}")
-                                        
-                                        # 检查bf16精度
-                                        old_val = first_val
-                                        new_val_theoretical = old_val + expected_update
-                                        new_val_bf16 = torch.tensor(new_val_theoretical, dtype=torch.bfloat16).item()
-                                        actual_change = new_val_bf16 - old_val
-                                        
-                                        print(f"  Theoretical new value: {new_val_theoretical:.10f}")
-                                        print(f"  BF16 new value: {new_val_bf16:.10f}")
-                                        print(f"  Actual change after BF16: {actual_change:.10f}")
-                                        
-                                        if abs(actual_change) < 1e-8:
-                                            print(f"  🚨 BF16 precision issue! Update too small!")
-                                        else:
-                                            print(f"  ✅ Update should be detectable")
-                                            
-                                except Exception as e:
-                                    print(f"  Error accessing parameter: {e}")
-                                    print(f"  Parameter type: {type(param)}")
-                                    print(f"  Parameter device: {param.device if hasattr(param, 'device') else 'unknown'}")
-                                break
                         self._optimizer.step()
-                        print(f"\n=== Step - After Optimizer Step ===")
-    
-                        for name, param in self._model.named_parameters():
-                            if 'draft' in name and 'input_layernorm.scale' in name:
-                                try:
-                                    if hasattr(param, 'to_local'):
-                                        local_param = param.to_local()
-                                    else:
-                                        local_param = param.data
-                                    
-                                    if local_param.numel() > 0:
-                                        new_val = local_param.flatten()[0].item()
-                                        print(f"  New value[0]: {new_val:.10f}")
-                                        print(f"  New mean: {local_param.mean().item():.10f}")
-                                    else:
-                                        print(f"  Empty tensor on this rank")
-                                        
-                                except Exception as e:
-                                    print(f"  Error accessing updated parameter: {e}")
-                                break
-                        print()
                         # for name, param in self._model.named_parameters():
                         #     if 'draft' in name and 'norm' in name.lower() and 'scale' in name:
                         #         scale_values = param.data

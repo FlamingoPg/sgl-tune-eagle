@@ -98,7 +98,7 @@ def set_trainable_params(
         None
     """
     for k, v in model.named_parameters():
-        v.requires_grad_(k in adapter_params or k == "decoder.output.weight")
+        v.requires_grad_(k in adapter_params)
 
 
 def get_lora_module_names(
