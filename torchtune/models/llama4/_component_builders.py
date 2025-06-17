@@ -65,7 +65,7 @@ def llama4_draft_decoder(
     max_seq_len: int,
     attn_dropout: float = 0.0,
     rope_base: int = 500_000,
-    norm_eps: float = 1e-5,
+    norm_eps: float = 1e-6,
     num_experts: int = 16,
     experts_per_token: int = 1,
     use_shared_expert: bool = True,
@@ -88,14 +88,8 @@ def llama4_draft_decoder(
     head_dim = embed_dim // num_heads
     num_kv_heads = num_kv_heads if num_kv_heads else num_heads
 
-    rope = Llama4ScaledRoPE(
-        dim=head_dim,
-        max_seq_len=max_seq_len,
-        base=rope_base,
-        scale_factor=rope_scale_factor,
-        low_freq_factor=rope_low_freq_factor,
-        high_freq_factor=rope_high_freq_factor,
-        old_context_len=old_context_len,
+    rope = RotaryPositionalEmbeddings(
+        dim=head_dim, max_seq_len=max_seq_len, base=rope_base
     )
     layers = []
     for i in range(num_layers):
@@ -124,25 +118,19 @@ def llama4_draft_decoder(
         layer = TransformerDraftAttentionLayer(
             attn=self_attn,
             mlp=mlp_layer,
-            sa_norm=None,
+            post_attention_layernorm=RMSNorm(dim=embed_dim, eps=norm_eps),
             mlp_norm=RMSNorm(dim=embed_dim, eps=norm_eps),
+            input_layernorm=RMSNorm(dim=embed_dim, eps=norm_eps),
+            hidden_norm=RMSNorm(dim=embed_dim, eps=norm_eps),
             mask_mod=mask_mod,
         )
         layers.append(layer)
     layers = nn.ModuleList(layers)
 
     tok_embeddings = nn.Identity()
-    output_proj = nn.Identity
+    output_proj = nn.Identity()
     
-    return TransformerDecoder(
-        tok_embeddings=tok_embeddings,
-        layers=layers,
-        max_seq_len=max_seq_len,
-        num_heads=num_heads,
-        head_dim=head_dim,
-        norm=RMSNorm(dim=embed_dim, eps=norm_eps),
-        output=output_proj
-    )
+    return layers
 
 
 class EAGLE3DraftModel(nn.Module):
@@ -188,8 +176,9 @@ class EAGLE3DraftModel(nn.Module):
         # )
 
         # 3. 添加RMSNorm层
-        self.input_embeds_norm = RMSNorm(dim=self.embed_dim, eps=self.norm_eps)
-        self.fused_features_norm = RMSNorm(dim=self.embed_dim, eps=self.norm_eps)
+        # self.input_embeds_norm = RMSNorm(dim=self.embed_dim, eps=self.norm_eps)
+        # self.fused_features_norm = RMSNorm(dim=self.embed_dim, eps=self.norm_eps)
+
 
         # 4. Draft decoder（核心transformer层）
         self.draft_decoder = llama4_draft_decoder(
@@ -209,12 +198,10 @@ class EAGLE3DraftModel(nn.Module):
         self, *, device: Optional[Union[str, torch.device, int]], recurse: bool = True
     ):
         self.feature_fusion.to_empty(device=device, recurse=recurse)
-        self.input_embeds_norm.to_empty(device=device, recurse=recurse)
-        self.fused_features_norm.to_empty(device=device, recurse=recurse)
         
-        self.draft_decoder.norm.to_empty(device=device, recurse=recurse)
+        # self.draft_decoder.norm.to_empty(device=device, recurse=recurse)
         
-        for layer in self.draft_decoder.layers:
+        for layer in self.draft_decoder:
         
             layer.mlp_norm.to_empty(device=device, recurse=recurse)
         
@@ -229,6 +216,10 @@ class EAGLE3DraftModel(nn.Module):
             # layer.mlp.shared_expert.w1.to_empty(device=device, recurse=recurse)
             # layer.mlp.shared_expert.w2.to_empty(device=device, recurse=recurse)
             # layer.mlp.shared_expert.w3.to_empty(device=device, recurse=recurse)
+            layer.input_layernorm.to_empty(device=device, recurse=recurse)
+            layer.hidden_norm.to_empty(device=device, recurse=recurse)
+            layer.post_attention_layernorm.to_empty(device=device, recurse=recurse)
+            layer.mlp_norm.to_empty(device=device, recurse=recurse)
             
             layer.mlp.w1.to_empty(device=device, recurse=recurse)
             layer.mlp.w2.to_empty(device=device, recurse=recurse)
@@ -243,13 +234,11 @@ class EAGLE3DraftModel(nn.Module):
         if self.feature_fusion.bias is not None:
             nn.init.zeros_(self.feature_fusion.bias)
 
-        self.input_embeds_norm.reset_parameters()
-        self.fused_features_norm.reset_parameters()
         # Initialize RMSNorm layers
-        self.draft_decoder.norm.reset_parameters()
+        # self.draft_decoder.norm.reset_parameters()
 
         # Initialize draft decoder layers
-        for layer in self.draft_decoder.layers:
+        for layer in self.draft_decoder:
             layer.attn.q_proj.reset_parameters()
             layer.attn.k_proj.reset_parameters()
             layer.attn.v_proj.reset_parameters()
@@ -260,6 +249,9 @@ class EAGLE3DraftModel(nn.Module):
             # layer.mlp.shared_expert.w1.reset_parameters()
             # layer.mlp.shared_expert.w2.reset_parameters()
             # layer.mlp.shared_expert.w3.reset_parameters()
+            layer.input_layernorm.reset_parameters()
+            layer.hidden_norm.reset_parameters()
+            layer.post_attention_layernorm.reset_parameters()
             layer.mlp_norm.reset_parameters()
             
             layer.mlp.w1.reset_parameters()
@@ -295,20 +287,21 @@ class EAGLE3DraftModel(nn.Module):
         fused_features = self.feature_fusion(concatenated_features)
 
         # 2. 对input_embeds和fused_features进行RMSNorm
-        input_embeds = self.input_embeds_norm(input_embeds)
-        fused_features = self.fused_features_norm(fused_features)
+        # input_embeds = self.input_embeds_norm(input_embeds)
+        # fused_features = self.fused_features_norm(fused_features)
 
         # 3. 特征与token embedding融合
         # [B, seq_len, 2*embed_dim] -> [B, seq_len, embed_dim]
-        combined_input = torch.cat([input_embeds, fused_features], dim=-1)
+        # combined_input = torch.cat([input_embeds, fused_features], dim=-1)
         # projected_input = self.input_projection(combined_input)
 
         # 4. Draft decoder前向传播
-        draft_outputs = self.draft_decoder(
-            tokens=None,
-            mask=mask,
-            input_embeds=combined_input,
-        )
+        for draft in self.draft_decoder:
+            draft_outputs = draft(
+                embeds=input_embeds,
+                hidden_states=fused_features,
+                mask=mask,
+            )
 
         # 5. 输出投影
         hidden_states = draft_outputs
@@ -332,7 +325,7 @@ def llama4_draft_model(
     intermediate_dim: int = 11008,
     max_seq_len: int = 8192,
     rope_base: float = 500000,
-    norm_eps: float = 1e-5,
+    norm_eps: float = 1e-6,
     num_feature_layers: int = 3,  # 融合几层特征(low, mid, high)
     dropout: float = 0.0,
 ) -> nn.Module:
@@ -495,7 +488,7 @@ def llama4_decoder(
     max_seq_len: int,
     attn_dropout: float = 0.0,
     rope_base: int = 500_000,
-    norm_eps: float = 1e-5,
+    norm_eps: float = 1e-6,
     num_experts: int = 16,
     experts_per_token: int = 1,
     use_shared_expert: bool = True,
@@ -637,9 +630,9 @@ def llama4_decoder(
     output_proj = nn.Linear(embed_dim, vocab_size, bias=False)
     
     num_layers = len(layers)
-    low = num_layers // 4
-    mid = num_layers // 2 - 2
-    high = num_layers - 2
+    low = 2
+    mid = num_layers // 2
+    high = num_layers - 3
     output_hidden_states = [low, mid, high]
     
     return TransformerDecoder(

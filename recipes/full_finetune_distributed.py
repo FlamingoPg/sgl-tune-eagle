@@ -53,44 +53,6 @@ from torchtune.training.quantization import (
 
 from tqdm import tqdm
 
-
-def check_draft_params_in_optimizer(optimizer, model):
-    """专门检查 draft 模块的参数是否在优化器中"""
-    
-    # 获取优化器中所有参数的ID
-    optimizer_param_ids = set()
-    for group in optimizer.param_groups:
-        for param in group['params']:
-            optimizer_param_ids.add(id(param))
-    
-    print("=== Draft Model Parameter Check ===")
-    draft_params_count = 0
-    draft_params_in_optimizer = 0
-    
-    for name, param in model.named_parameters():
-        if name.startswith('draft.') and 'scale' in name:
-            draft_params_count += 1
-            in_optimizer = id(param) in optimizer_param_ids
-            
-            if in_optimizer:
-                draft_params_in_optimizer += 1
-                status = "✓"
-            else:
-                status = "✗"
-            
-            print(f"{status} {name}")
-            print(f"    requires_grad: {param.requires_grad}")
-            print(f"    in_optimizer: {in_optimizer}")
-            print(f"    param_id: {id(param)}")
-    
-    print(f"\nSummary: {draft_params_in_optimizer}/{draft_params_count} draft scale params in optimizer")
-    
-    if draft_params_in_optimizer == 0:
-        print("🚨 WARNING: NO draft scale parameters found in optimizer!")
-    
-    return draft_params_in_optimizer == 0
-
-
 class FullFinetuneRecipeDistributed(FTRecipeInterface):
     """
     Full finetuning recipe for dense transformer-based LLMs such as Llama2. This recipe supports
@@ -938,7 +900,6 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
         """
         The core training loop.
         """
-        is_missing = check_draft_params_in_optimizer(self._optimizer, self._model)
         # clean up before training begins
         training.cleanup_before_training()
 
@@ -1015,7 +976,110 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
                             # If sharded, collect the DTensor here
                             if isinstance(grad_norm, DTensor):
                                 grad_norm = grad_norm.full_tensor()
+                        print(f"\n=== Step - Before Optimizer Step ===")
+    
+                        for name, param in self._model.named_parameters():
+                            if 'draft' in name and 'input_layernorm.scale' in name:  # 只检查一个代表性的
+                                print(f"{name}:")
+                                
+                                # 处理分布式张量
+                                try:
+                                    if hasattr(param, 'to_local'):
+                                        # DTensor - 转换为本地张量
+                                        local_param = param.to_local()
+                                        local_grad = param.grad.to_local() if param.grad is not None else None
+                                        print(f"  Using DTensor.to_local()")
+                                    else:
+                                        # 普通张量
+                                        local_param = param.data
+                                        local_grad = param.grad
+                                    
+                                    # 安全地获取第一个元素
+                                    if local_param.numel() > 0:
+                                        first_val = local_param.flatten()[0].item()
+                                        print(f"  Current value[0]: {first_val:.10f}")
+                                        print(f"  Tensor shape: {local_param.shape}")
+                                        print(f"  Mean: {local_param.mean().item():.10f}")
+                                        print(f"  Std: {local_param.std().item():.10f}")
+                                    else:
+                                        print(f"  Empty tensor on this rank")
+                                        continue
+                                    
+                                    print(f"  Has grad: {param.grad is not None}")
+                                    
+                                    if param.grad is not None and local_grad.numel() > 0:
+                                        grad_first = local_grad.flatten()[0].item()
+                                        grad_norm = local_grad.norm().item()
+                                        print(f"  Grad[0]: {grad_first:.10f}")
+                                        print(f"  Grad norm: {grad_norm:.6f}")
+                                        
+                                        # 计算预期更新
+                                        lr = 1e-4  # 你的学习率
+                                        expected_update = lr * grad_first
+                                        print(f"  Expected update: {expected_update:.10f}")
+                                        
+                                        # 检查bf16精度
+                                        old_val = first_val
+                                        new_val_theoretical = old_val + expected_update
+                                        new_val_bf16 = torch.tensor(new_val_theoretical, dtype=torch.bfloat16).item()
+                                        actual_change = new_val_bf16 - old_val
+                                        
+                                        print(f"  Theoretical new value: {new_val_theoretical:.10f}")
+                                        print(f"  BF16 new value: {new_val_bf16:.10f}")
+                                        print(f"  Actual change after BF16: {actual_change:.10f}")
+                                        
+                                        if abs(actual_change) < 1e-8:
+                                            print(f"  🚨 BF16 precision issue! Update too small!")
+                                        else:
+                                            print(f"  ✅ Update should be detectable")
+                                            
+                                except Exception as e:
+                                    print(f"  Error accessing parameter: {e}")
+                                    print(f"  Parameter type: {type(param)}")
+                                    print(f"  Parameter device: {param.device if hasattr(param, 'device') else 'unknown'}")
+                                break
                         self._optimizer.step()
+                        print(f"\n=== Step - After Optimizer Step ===")
+    
+                        for name, param in self._model.named_parameters():
+                            if 'draft' in name and 'input_layernorm.scale' in name:
+                                try:
+                                    if hasattr(param, 'to_local'):
+                                        local_param = param.to_local()
+                                    else:
+                                        local_param = param.data
+                                    
+                                    if local_param.numel() > 0:
+                                        new_val = local_param.flatten()[0].item()
+                                        print(f"  New value[0]: {new_val:.10f}")
+                                        print(f"  New mean: {local_param.mean().item():.10f}")
+                                    else:
+                                        print(f"  Empty tensor on this rank")
+                                        
+                                except Exception as e:
+                                    print(f"  Error accessing updated parameter: {e}")
+                                break
+                        print()
+                        # for name, param in self._model.named_parameters():
+                        #     if 'draft' in name and 'norm' in name.lower() and 'scale' in name:
+                        #         scale_values = param.data
+                                
+                        #         print(f"{name}:")
+                        #         print(f"  First 5 values: {scale_values}")
+                        # for name, param in self._model.named_parameters():
+                        #     if 'draft' in name and 'norm' in name.lower() and 'scale' in name:
+                        #         print(f"{name}:")
+                        #         print(f"  requires_grad: {param.requires_grad}")
+                        #         print(f"  device: {param.device}")
+                        #         print(f"  in optimizer: {any(param in group['params'] for group in self._optimizer.param_groups)}")
+                        # print("=== Optimizer param groups ===")
+                        # total_params_in_opt = 0
+                        # for i, group in enumerate(self._optimizer.param_groups):
+                        #     print(f"Group {i}: {len(group['params'])} params, lr = {group['lr']}")
+                        #     total_params_in_opt += len(group['params'])
+
+                        # trainable_params = sum(1 for p in self._model.parameters() if p.requires_grad)
+                        # print(f"Trainable params: {trainable_params}, In optimizer: {total_params_in_opt}")
                         self._optimizer.zero_grad(set_to_none=True)
 
                     # Update the number of steps when the weights are updated

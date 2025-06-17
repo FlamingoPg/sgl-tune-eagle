@@ -161,20 +161,21 @@ class TransformerDraftAttentionLayer(nn.Module):
         attn: MultiHeadAttention,
         mlp: nn.Module,
         *,
-        sa_norm: Optional[nn.Module] = None,
+        post_attention_layernorm: Optional[nn.Module] = None,
         mlp_norm: Optional[nn.Module] = None,
-        sa_scale: Optional[nn.Module] = None,
-        mlp_scale: Optional[nn.Module] = None,
+        input_layernorm: Optional[nn.Module] = None,
+        hidden_norm: Optional[nn.Module] = None,
         mask_mod: Optional[Callable[[_MaskType, int, int, int], _MaskType]] = None,
     ) -> None:
         super().__init__()
         self.attn = attn
         self.mlp = mlp
-        self.sa_norm = sa_norm or nn.Identity()
+        self.post_attention_layernorm = post_attention_layernorm or nn.Identity()
         self.mlp_norm = mlp_norm or nn.Identity()
-        self.sa_scale = sa_scale or nn.Identity()
-        self.mlp_scale = mlp_scale or nn.Identity()
         self.mask_mod = mask_mod or None
+
+        self.input_layernorm = input_layernorm
+        self.hidden_norm = hidden_norm
 
     def setup_caches(
         self,
@@ -214,7 +215,8 @@ class TransformerDraftAttentionLayer(nn.Module):
 
     def forward(
         self,
-        x: torch.Tensor,
+        embeds: torch.Tensor,
+        hidden_states: torch.Tensor,
         *,
         mask: Optional[_MaskType] = None,
         input_pos: Optional[torch.Tensor] = None,
@@ -252,22 +254,35 @@ class TransformerDraftAttentionLayer(nn.Module):
         # [b, s, d]
         # Norm applied before self-attention
         
-        residual = x[..., 5120:]
+        # print("input norm: ", self.input_layernorm.scale)
+        # print("hidden norm: ", self.hidden_norm.scale)
         
-        h = self.sa_norm(x)
+        residual = hidden_states
+        embeds = self.input_layernorm(embeds)
+        hidden_states = self.hidden_norm(hidden_states)
+        
+        hidden_states = torch.cat([embeds, hidden_states], dim=-1)
+        
+        # h = self.sa_norm(x)
         if self.mask_mod is not None:
             # With TP we need to use a replicated tensor here
             bsz, seq_len, *_ = h.shape
             mask = self.mask_mod(mask=mask, bsz=bsz, seq_len=seq_len)
-        attn_out = self.attn(h, h, mask=mask, input_pos=input_pos)
+        attn_out = self.attn(hidden_states, hidden_states, mask=mask, input_pos=input_pos)
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
-        h = self.sa_scale(attn_out) + residual
+        
+        residual += attn_out
+        h = self.post_attention_layernorm(residual)
+        # print("post norm", self.post_attention_layernorm.scale)
 
         # Norm applied before the feedforward layer
-        mlp_out = self.mlp(self.mlp_norm(h))
+        mlp_out = self.mlp(h)
 
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
-        out = h + self.mlp_scale(mlp_out)
+        residual += mlp_out
+        out = self.mlp_norm(residual)
+        # print("mlp norm", self.mlp_norm.scale)
+        
         return out
 
 

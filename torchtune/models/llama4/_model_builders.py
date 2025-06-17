@@ -73,7 +73,7 @@ def llama4_scout_17b_16e(
         max_seq_len=10485760,
         attn_dropout=0.0,
         rope_base=500_000,
-        norm_eps=1e-5,
+        norm_eps=1e-6,
         num_experts=16,
         use_shared_expert=True,
         skip_rope_interval=4,
@@ -90,7 +90,7 @@ def llama4_scout_17b_16e(
         intermediate_dim=32768,
         max_seq_len=10485760,
         rope_base=500_000,
-        norm_eps=1e-5,
+        norm_eps=1e-6,
     )
     
     return EarlyFusionModel(

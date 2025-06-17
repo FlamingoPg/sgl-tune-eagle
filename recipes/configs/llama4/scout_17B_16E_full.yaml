@@ -44,12 +44,18 @@ resume_from_checkpoint: False
 # Dataset
 dataset:
   - _component_: torchtune.datasets.chat_dataset
-    source: json
-    data_files: /sgl-workspace/20250610_055345_1_data_start0_all.jsonl
+    source: Aeala/ShareGPT_Vicuna_unfiltered
     conversation_column: conversations
     conversation_style: sharegpt
     packed: False
     split: train
+  # - _component_: torchtune.datasets.chat_dataset
+  #   source: json
+  #   data_files: /sgl-workspace/20250610_055345_1_data_start0_all.jsonl
+  #   conversation_column: conversations
+  #   conversation_style: sharegpt
+  #   packed: False
+  #   split: train
   # - _component_: torchtune.datasets.chat_dataset
   #   source: HuggingFaceH4/ultrachat_200k
   #   conversation_column: messages
@@ -74,7 +80,7 @@ shuffle: True
 # Training arguments
 epochs: 1
 max_steps_per_epoch: null
-batch_size: 2
+batch_size: 1
 gradient_accumulation_steps: 8 # Use to increase effective batch size
 optimizer:
   _component_: torch.optim.AdamW
@@ -85,7 +91,7 @@ optimizer:
 optimizer_in_bwd: False
 lr_scheduler:
   _component_: torchtune.training.lr_schedulers.get_cosine_schedule_with_warmup
-  num_warmup_steps: 1
+  num_warmup_steps: 10
   last_epoch: -1
 loss:
   _component_: torchtune.modules.loss.DraftLoss
@@ -109,7 +115,7 @@ compile: False
 #    scale_grads: True
 
 # Reduced precision
-dtype: bf16
+dtype: fp32
 
 # Log metrics during training
 metric_logger:
