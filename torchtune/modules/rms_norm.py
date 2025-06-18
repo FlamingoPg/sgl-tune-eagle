@@ -19,7 +19,7 @@ class RMSNorm(nn.Module):
         eps (float): small value to avoid division by zero. Default: 1e-6
     """
 
-    def __init__(self, dim: int, eps: float = 1e-6) -> None:
+    def __init__(self, dim: int, eps: float = 1e-5) -> None:
         super().__init__()
         self.normalized_shape = (dim,)
         self.eps = eps

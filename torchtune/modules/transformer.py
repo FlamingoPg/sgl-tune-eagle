@@ -259,10 +259,11 @@ class TransformerDraftAttentionLayer(nn.Module):
         
         residual = hidden_states
         if torch.cuda.current_device() == 0:
-            print("atten input ",embeds.shape,embeds)
+            print("embeds input ",embeds.shape,embeds)
         embeds = self.input_layernorm(embeds)
         hidden_states = self.hidden_norm(hidden_states)
-        
+        if torch.cuda.current_device() == 0:
+            print("input_embeds input ",embeds.shape,embeds)
         hidden_states = torch.cat([embeds, hidden_states], dim=-1)
         if torch.cuda.current_device() == 0:
             print("atten input ",hidden_states.shape,hidden_states)
