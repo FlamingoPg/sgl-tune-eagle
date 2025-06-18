@@ -278,6 +278,7 @@ class TransformerDraftAttentionLayer(nn.Module):
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
         hidden_states = attn_out + residual
         if torch.cuda.current_device() == 0:
+            print(" + residual input ",residual.shape,residual,self.post_attention_layernorm.eps)
             print("attn_out + residual input ",hidden_states.shape,hidden_states,self.post_attention_layernorm.eps)
         residual = hidden_states
         hidden_states = self.post_attention_layernorm(hidden_states)
