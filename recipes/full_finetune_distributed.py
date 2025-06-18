@@ -708,7 +708,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
         }
 
         # Get the model's current state dict keys to filter safetensor parameters
-        model_keys = set(model_state_dict.keys())
+        model_keys = set(model.state_dict().keys())
         
         # Filter safetensor state dict to only include parameters that exist in the model
         filtered_safetensor_dict = {}
