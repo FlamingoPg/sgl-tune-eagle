@@ -277,10 +277,12 @@ class TransformerDraftAttentionLayer(nn.Module):
             print("attn_out input ",attn_out.shape,attn_out)
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
         hidden_states = attn_out + residual
+        if torch.cuda.current_device() == 0:
+            print("attn_out + residual input ",attn_out.shape,attn_out,self.post_attention_layernorm.eps)
         residual = hidden_states
         hidden_states = self.post_attention_layernorm(hidden_states)
         if torch.cuda.current_device() == 0:
-            print("mlp input ",attn_out.shape,attn_out)
+            print("mlp input ",attn_out.shape,attn_out,self.post_attention_layernorm.eps)
         # print("post norm", self.post_attention_layernorm.scale)
 
         # Norm applied before the feedforward layer
