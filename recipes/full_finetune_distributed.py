@@ -681,7 +681,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
                     m.to_empty(device=self._device)
                     m.initialize_parameters()
                     model_keys = set(model_state_dict.keys())
-                    print("ffff ",model_keys)
+                    print("fff11111 ",model_keys)
                 # RoPE is not covered in state dict
                 if hasattr(m, "rope_init"):
                     m.rope_init()
