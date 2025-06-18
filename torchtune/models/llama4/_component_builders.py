@@ -308,7 +308,10 @@ class EAGLE3DraftModel(nn.Module):
 
         # 5. 输出投影
         hidden_states = draft_outputs
-
+        if torch.cuda.current_device() == 0:
+            print("draft_outputs ",draft_outputs.shape,draft_outputs)
+        import os
+        os.abort(0)
         # return {
         #     'hidden_states': hidden_states,
         #     'logits': draft_outputs.logits,

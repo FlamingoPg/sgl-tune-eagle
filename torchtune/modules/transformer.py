@@ -262,7 +262,8 @@ class TransformerDraftAttentionLayer(nn.Module):
         hidden_states = self.hidden_norm(hidden_states)
         
         hidden_states = torch.cat([embeds, hidden_states], dim=-1)
-        
+        if torch.cuda.current_device() == 0:
+            print("atten input ",hidden_states.shape,hidden_states)
         # h = self.sa_norm(x)
         if self.mask_mod is not None:
             # With TP we need to use a replicated tensor here
@@ -270,7 +271,8 @@ class TransformerDraftAttentionLayer(nn.Module):
             mask = self.mask_mod(mask=mask, bsz=bsz, seq_len=seq_len)
         attn_out = self.attn(hidden_states, hidden_states, mask=mask, input_pos=input_pos)
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
-        
+        if torch.cuda.current_device() == 0:
+            print("attn_out input ",attn_out.shape,attn_out)
         hidden_states = attn_out + residual
         residual = hidden_states
         hidden_states = self.post_attention_layernorm(hidden_states)
@@ -278,7 +280,8 @@ class TransformerDraftAttentionLayer(nn.Module):
 
         # Norm applied before the feedforward layer
         mlp_out = self.mlp(hidden_states)
-
+        if torch.cuda.current_device() == 0:
+            print("mlp_out input ",mlp_out.shape,mlp_out)
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
         hidden_states = mlp_out + residual
         out = self.mlp_norm(hidden_states)
