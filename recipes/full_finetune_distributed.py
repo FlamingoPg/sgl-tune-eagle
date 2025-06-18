@@ -680,9 +680,9 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
                 if isinstance(m, EAGLE3DraftModel):
                     m.to_empty(device=self._device)
                     m.initialize_parameters()
-                    model_keys = set(model_state_dict.keys())
                     if self._is_rank_zero:
-                        print("fff11111 ",model_keys)
+                        for name, param in m.named_parameters():
+                            print(f"Parameter: {name}")
                 # RoPE is not covered in state dict
                 if hasattr(m, "rope_init"):
                     m.rope_init()
