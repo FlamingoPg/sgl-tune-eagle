@@ -680,7 +680,8 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
                 if isinstance(m, EAGLE3DraftModel):
                     m.to_empty(device=self._device)
                     m.initialize_parameters()
-                
+                    model_keys = set(model_state_dict.keys())
+                    print("ffff ",model_keys)
                 # RoPE is not covered in state dict
                 if hasattr(m, "rope_init"):
                     m.rope_init()
@@ -690,9 +691,9 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
         safetensor_state_dict = load_file(safetensor_path)
 
         # Get the model's current state dict keys to filter safetensor parameters
+       
         model_keys = set(model_state_dict.keys())
         
-        print("fffff ",model_keys)
         # Filter safetensor state dict to only include parameters that exist in the model
         filtered_safetensor_dict = {}
         for key, value in safetensor_state_dict.items():
