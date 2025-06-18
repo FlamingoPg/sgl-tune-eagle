@@ -688,7 +688,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
                     m.rope_init()
 
         # Load additional weights from safetensor file if specified
-        safetensor_path = "/sgl-workspace/sgl-tune-eagle/llama4_draft_freeze/model.safetensors"
+        safetensor_path = "/root/.cache/huggingface/hub/models--nvidia--Llama-4-Maverick-17B-128E-Eagle3/snapshots/86b81513f87e162f2eb55b135fff66379d52ed74/model.safetensors"
         safetensor_state_dict = load_file(safetensor_path)
 
         # Create parameter mapping from safetensor names to model names
