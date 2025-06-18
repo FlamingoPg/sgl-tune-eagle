@@ -292,9 +292,12 @@ class TransformerDraftAttentionLayer(nn.Module):
             print("mlp_out input ",mlp_out.shape,mlp_out)
         # Residual connection; shape: [batch_size, seq_length, embed_dim]
         hidden_states = mlp_out + residual
+        if torch.cuda.current_device() == 0:
+            print("mlp_out  residual input ",residual.shape,residual)
         out = self.mlp_norm(hidden_states)
         # print("mlp norm", self.mlp_norm.scale)
-        
+        if torch.cuda.current_device() == 0:
+            print("mlp_norm   input ",residual.shape,residual)
         return out
 
 
