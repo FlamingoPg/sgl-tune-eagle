@@ -297,7 +297,7 @@ class TransformerDraftAttentionLayer(nn.Module):
         out = self.mlp_norm(hidden_states)
         # print("mlp norm", self.mlp_norm.scale)
         if torch.cuda.current_device() == 0:
-            print("mlp_norm   input ",residual.shape,residual)
+            print("mlp_norm   input ",out.shape,out)
         return out
 
 
