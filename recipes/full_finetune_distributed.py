@@ -693,7 +693,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
 
         # Create parameter mapping from safetensor names to model names
         param_mapping = {
-            'fc.weight': 'draft.feature_fusion.weight',
+            'feature_fusion.weight': 'draft.feature_fusion.weight',
             'midlayer.self_attn.q_proj.weight': 'draft.draft_decoder.0.attn.q_proj.weight',
             'midlayer.self_attn.k_proj.weight': 'draft.draft_decoder.0.attn.k_proj.weight',
             'midlayer.self_attn.v_proj.weight': 'draft.draft_decoder.0.attn.v_proj.weight',
