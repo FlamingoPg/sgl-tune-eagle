@@ -14,6 +14,7 @@ from warnings import warn
 
 import torch
 from omegaconf import DictConfig, ListConfig
+from safetensors.torch import load_file
 
 from torch import nn
 from torch.distributed import destroy_process_group, init_process_group
@@ -684,6 +685,35 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
                 if hasattr(m, "rope_init"):
                     m.rope_init()
 
+        # Load additional weights from safetensor file if specified
+        safetensor_path = "/sgl-workspace/sgl-tune-eagle/llama4_draft_freeze/model.safetensors"
+        safetensor_state_dict = load_file(safetensor_path)
+
+        # Get the model's current state dict keys to filter safetensor parameters
+        model_keys = set(model_state_dict.keys())
+        
+        # Filter safetensor state dict to only include parameters that exist in the model
+        filtered_safetensor_dict = {}
+        for key, value in safetensor_state_dict.items():
+            if key in model_keys:
+                filtered_safetensor_dict[key] = value
+            else:
+                if self._is_rank_zero:
+                    print(f"Warning: Parameter '{key}' from safetensor not found in model, skipping.")
+
+        # Ensure device consistency by moving safetensor tensors to the same device as model_state_dict
+        if model_state_dict:
+            # Get the device of the first tensor in model_state_dict
+            sample_tensor = next(iter(model_state_dict.values()))
+            if hasattr(sample_tensor, 'device'):
+                target_device = sample_tensor.device
+                # Move all safetensor tensors to the same device
+                filtered_safetensor_dict = {k: v.to(target_device) for k, v in filtered_safetensor_dict.items()}
+        
+        if self._is_rank_zero:
+            print(f"Loaded {len(filtered_safetensor_dict)} parameters from safetensor file")
+        
+        model_state_dict.update(filtered_safetensor_dict)
 
         # This method will convert the full model state dict into a sharded state
         # dict and load into the model
