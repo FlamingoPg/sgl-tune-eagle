@@ -709,7 +709,8 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
 
         # Get the model's current state dict keys to filter safetensor parameters
         model_keys = set(model.state_dict().keys())
-        
+        if self._is_rank_zero:
+            print("ffff ",model_keys)
         # Filter safetensor state dict to only include parameters that exist in the model
         filtered_safetensor_dict = {}
         for key, value in safetensor_state_dict.items():
