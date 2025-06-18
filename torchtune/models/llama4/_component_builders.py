@@ -609,6 +609,7 @@ def llama4_decoder(
             k_norm=k_norm,
             max_seq_len=max_seq_len,
             attn_dropout=attn_dropout,
+            debug=True,
         )
         is_moe = moe_every_n_layers is None or (i + 1) % moe_every_n_layers == 0
         if is_moe:

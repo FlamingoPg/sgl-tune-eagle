@@ -71,6 +71,7 @@ class MultiHeadAttention(nn.Module):
         is_causal (bool): sets the default mask to causal when no mask is provided
         attn_dropout (float): dropout value passed onto the scaled_dot_product_attention function.
             Default value is 0.0.
+        debug (bool): debug flag for additional logging
 
     Raises:
         ValueError:
@@ -98,6 +99,7 @@ class MultiHeadAttention(nn.Module):
         max_seq_len: int = 4096,
         is_causal: bool = True,
         attn_dropout: float = 0.0,
+        debug: bool = False,
     ) -> None:
         super().__init__()
         if num_heads % num_kv_heads != 0:
@@ -125,6 +127,7 @@ class MultiHeadAttention(nn.Module):
         self.head_dim = head_dim
         self.max_seq_len = max_seq_len
         self.is_causal = is_causal
+        self.debug = debug
 
         # Set layers
         self.kv_cache = kv_cache
@@ -288,7 +291,7 @@ class MultiHeadAttention(nn.Module):
             expand_shape = (b, self.num_kv_heads, q_per_kv, -1, self.head_dim)
             k = k.unsqueeze(2).expand(expand_shape).flatten(1, 2)
             v = v.unsqueeze(2).expand(expand_shape).flatten(1, 2)
-        if torch.cuda.current_device() == 0:
+        if self.debug and torch.cuda.current_device() == 0:
             print("q,k,v",q,k,v)
         output = self._attention_call(
             q,
