@@ -693,18 +693,18 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
 
         # Create parameter mapping from safetensor names to model names
         param_mapping = {
-            'fc.weight': 'feature_fusion.weight',
-            'midlayer.self_attn.q_proj.weight': 'draft_decoder.0.attn.q_proj.weight',
-            'midlayer.self_attn.k_proj.weight': 'draft_decoder.0.attn.k_proj.weight',
-            'midlayer.self_attn.v_proj.weight': 'draft_decoder.0.attn.v_proj.weight',
-            'midlayer.self_attn.o_proj.weight': 'draft_decoder.0.attn.output_proj.weight',
-            'midlayer.mlp.gate_proj.weight': 'draft_decoder.0.mlp.w1.weight',
-            'midlayer.mlp.down_proj.weight': 'draft_decoder.0.mlp.w2.weight',
-            'midlayer.mlp.up_proj.weight': 'draft_decoder.0.mlp.w3.weight',
-            'midlayer.post_attention_layernorm.weight': 'draft_decoder.0.post_attention_layernorm.scale',
-            'midlayer.input_layernorm.weight': 'draft_decoder.0.input_layernorm.scale',
-            'midlayer.hidden_norm.weight': 'draft_decoder.0.hidden_norm.scale',
-            'norm.weight': 'draft_decoder.0.mlp_norm.scale'
+            'fc.weight': 'draft.feature_fusion.weight',
+            'midlayer.self_attn.q_proj.weight': 'draft.draft_decoder.0.attn.q_proj.weight',
+            'midlayer.self_attn.k_proj.weight': 'draft.draft_decoder.0.attn.k_proj.weight',
+            'midlayer.self_attn.v_proj.weight': 'draft.draft_decoder.0.attn.v_proj.weight',
+            'midlayer.self_attn.o_proj.weight': 'draft.draft_decoder.0.attn.output_proj.weight',
+            'midlayer.mlp.gate_proj.weight': 'draft.draft_decoder.0.mlp.w1.weight',
+            'midlayer.mlp.down_proj.weight': 'draft.draft_decoder.0.mlp.w2.weight',
+            'midlayer.mlp.up_proj.weight': 'draft.draft_decoder.0.mlp.w3.weight',
+            'midlayer.post_attention_layernorm.weight': 'draft.draft_decoder.0.post_attention_layernorm.scale',
+            'midlayer.input_layernorm.weight': 'draft.draft_decoder.0.input_layernorm.scale',
+            'midlayer.hidden_norm.weight': 'draft.draft_decoder.0.hidden_norm.scale',
+            'norm.weight': 'draft.draft_decoder.0.mlp_norm.scale'
         }
 
         # Get the model's current state dict keys to filter safetensor parameters
