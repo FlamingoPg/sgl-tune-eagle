@@ -258,11 +258,8 @@ class TransformerDraftAttentionLayer(nn.Module):
         # print("hidden norm: ", self.hidden_norm.scale)
         
         residual = hidden_states
-        embeds = self.input_layernorm(embeds)
+
         hidden_states = self.hidden_norm(hidden_states)
-        
-        hidden_states = torch.cat([embeds, hidden_states], dim=-1)
-        
         # h = self.sa_norm(x)
         if self.mask_mod is not None:
             # With TP we need to use a replicated tensor here
