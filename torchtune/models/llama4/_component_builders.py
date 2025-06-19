@@ -285,7 +285,7 @@ class EAGLE3DraftModel(nn.Module):
 
         
         # 拼接多层特征 [B, seq_len, 3*embed_dim]
-        concatenated_features = torch.cat(input_embeds,feature_list)
+        concatenated_features = torch.cat(input_embeds,input_hidden)
         # 降维到embed_dim [B, seq_len, embed_dim]
         fused_features = self.feature_fusion(concatenated_features)
 
