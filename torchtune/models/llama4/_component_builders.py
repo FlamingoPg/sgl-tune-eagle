@@ -163,7 +163,7 @@ class EAGLE3DraftModel(nn.Module):
 
         # 1. 多层特征融合模块
         self.feature_fusion = nn.Linear(
-            self.num_feature_layers * self.embed_dim,  # 融合多层特征
+            self.num_feature_layers *2,  # 融合多层特征
             self.embed_dim,
             bias=False
         )
