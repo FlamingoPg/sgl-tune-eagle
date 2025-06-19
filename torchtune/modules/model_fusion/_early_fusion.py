@@ -295,7 +295,8 @@ class EarlyFusionModel(nn.Module):
         
         output_backbone = output[3]
         output = [output[0], output[1], output[2]]
-        
+        output = output[2]
+
         # TODO(yinfan98): need a new draft model mask here
         output = self.draft(tokens=None, mask=mask, input_pos=input_pos, input_embeds=fused_embeds, input_hidden=output) if self.draft is not None else output
         
