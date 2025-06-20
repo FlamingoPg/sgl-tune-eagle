@@ -12,15 +12,15 @@ def extract_draft_model(checkpoint_dir, output_dir):
         index = json.load(f)
 
     param_mapping = {
-        'model.draft_decoder.0.attn.k_proj.weight': 'midlayer.self_attn.k_proj.weight',
-        'model.draft_decoder.0.attn.output_proj.weight': 'midlayer.self_attn.o_proj.weight',
-        'model.draft_decoder.0.attn.q_proj.weight': 'midlayer.self_attn.q_proj.weight',
-        'model.draft_decoder.0.attn.v_proj.weight': 'midlayer.self_attn.v_proj.weight',
-        'model.draft_decoder.0.mlp.w1.weight': 'midlayer.mlp.gate_proj.weight',
-        'model.draft_decoder.0.mlp.w2.weight': 'midlayer.mlp.down_proj.weight',
-        'model.draft_decoder.0.mlp.w3.weight': 'midlayer.mlp.up_proj.weight',
-        'model.draft_decoder.0.mlp_norm.scale': 'midlayer.post_attention_layernorm.weight',
-        'model.draft_decoder.norm.scale': 'norm.weight',
+        'draft_decoder.layers.0.attn.k_proj.weight': 'midlayer.self_attn.k_proj.weight',
+        'draft_decoder.layers.0.attn.output_proj.weight': 'midlayer.self_attn.o_proj.weight',
+        'draft_decoder.layers.0.attn.q_proj.weight': 'midlayer.self_attn.q_proj.weight',
+        'draft_decoder.layers.0.attn.v_proj.weight': 'midlayer.self_attn.v_proj.weight',
+        'draft_decoder.layers.0.mlp.w1.weight': 'midlayer.mlp.gate_proj.weight',
+        'draft_decoder.layers.0.mlp.w2.weight': 'midlayer.mlp.down_proj.weight',
+        'draft_decoder.layers.0.mlp.w3.weight': 'midlayer.mlp.up_proj.weight',
+        'draft_decoder.layers.0.mlp_norm.scale': 'midlayer.post_attention_layernorm.weight',
+        'draft_decoder.norm.scale': 'norm.weight',
         'feature_fusion.weight': 'fc.weight',
         'input_embeds_norm.scale': 'midlayer.hidden_norm.weight',
         'fused_features_norm.scale': 'midlayer.input_layernorm.weight',
@@ -57,13 +57,20 @@ def extract_draft_model(checkpoint_dir, output_dir):
     save_file(draft_state_dict, os.path.join(output_dir, "model.safetensors"))
 
     config = {
-        "architectures": ["LlamaForCausalLMEagle"],
+        "architectures": ["LlamaForCausalLMEagle3"],
         "eagle_config": {
             "eagle_aux_hidden_state_layer_ids": [1, 23, 44],
             "use_aux_hidden_state": True,
             "use_input_layernorm_in_first_layer": True,
             "use_last_layernorm": True,
             "use_mtp_layernorm": False
+        },
+        "rope_scaling": {
+            "factor": 16.0,
+            "high_freq_factor": 1.0,
+            "low_freq_factor": 1.0,
+            "original_max_position_embeddings": 8192,
+            "rope_type": "llama3"
         },
         "attention_bias": False,
         "model_type": "llama",
