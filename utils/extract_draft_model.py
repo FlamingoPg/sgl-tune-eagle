@@ -12,24 +12,26 @@ def extract_draft_model(checkpoint_dir, output_dir):
         index = json.load(f)
 
     param_mapping = {
-        'draft_decoder.layers.0.attn.k_proj.weight': 'midlayer.self_attn.k_proj.weight',
-        'draft_decoder.layers.0.attn.output_proj.weight': 'midlayer.self_attn.o_proj.weight',
-        'draft_decoder.layers.0.attn.q_proj.weight': 'midlayer.self_attn.q_proj.weight',
-        'draft_decoder.layers.0.attn.v_proj.weight': 'midlayer.self_attn.v_proj.weight',
-        'draft_decoder.layers.0.mlp.w1.weight': 'midlayer.mlp.gate_proj.weight',
-        'draft_decoder.layers.0.mlp.w2.weight': 'midlayer.mlp.down_proj.weight',
-        'draft_decoder.layers.0.mlp.w3.weight': 'midlayer.mlp.up_proj.weight',
-        'draft_decoder.layers.0.mlp_norm.scale': 'midlayer.post_attention_layernorm.weight',
+        'draft_decoder.0.attn.k_proj.weight': 'midlayer.self_attn.k_proj.weight',
+        'draft_decoder.0.attn.output_proj.weight': 'midlayer.self_attn.o_proj.weight',
+        'draft_decoder.0.attn.q_proj.weight': 'midlayer.self_attn.q_proj.weight',
+        'draft_decoder.0.attn.v_proj.weight': 'midlayer.self_attn.v_proj.weight',
+        'draft_decoder.0.mlp.w1.weight': 'midlayer.mlp.gate_proj.weight',
+        'draft_decoder.0.mlp.w2.weight': 'midlayer.mlp.down_proj.weight',
+        'draft_decoder.0.mlp.w3.weight': 'midlayer.mlp.up_proj.weight',
+        'draft_decoder.0.post_attention_layernorm.scale': 'midlayer.post_attention_layernorm.weight',
         'draft_decoder.norm.scale': 'norm.weight',
         'feature_fusion.weight': 'fc.weight',
-        'input_embeds_norm.scale': 'midlayer.hidden_norm.weight',
-        'fused_features_norm.scale': 'midlayer.input_layernorm.weight',
+        'draft_decoder.0.hidden_norm.scale': 'midlayer.hidden_norm.weight',
+        'draft_decoder.0.input_layernorm.scale': 'midlayer.input_layernorm.weight',
         'lm_head.weight': 'lm_head.weight'
+
     }
 
     draft_state_dict = {}
     for weight_map in index['weight_map'].items():
         weight_name, shard_name = weight_map
+
         if weight_name.startswith('draft.') or "lm_head" in weight_name:
             shard_path = os.path.join(checkpoint_dir, shard_name)
             shard_weights = load_file(shard_path)
@@ -41,10 +43,9 @@ def extract_draft_model(checkpoint_dir, output_dir):
                 new_key = weight_name.replace("language_model.", "")
             else:
                 new_key = weight_name
-
+            print("dddd ",new_key,new_key in param_mapping)
             if new_key in param_mapping:
                 new_key = param_mapping[new_key]
-
             draft_state_dict[new_key] = weight
 
     if "midlayer.input_layernorm.weight" not in draft_state_dict:
