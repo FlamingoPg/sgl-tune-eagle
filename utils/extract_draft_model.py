@@ -89,6 +89,7 @@ def extract_draft_model(checkpoint_dir, output_dir):
         "tie_word_embeddings": False,
         "torch_dtype": "bfloat16",
         "pad_token_id": 0,
+        "rope_is_neox_style": False
     }
 
     with open(os.path.join(output_dir, "config.json"), 'w') as f:
