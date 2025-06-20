@@ -57,20 +57,13 @@ def extract_draft_model(checkpoint_dir, output_dir):
     save_file(draft_state_dict, os.path.join(output_dir, "model.safetensors"))
 
     config = {
-        "architectures": ["LlamaForCausalLMEagle3"],
+        "architectures": ["LlamaForCausalLMEagle"],
         "eagle_config": {
             "eagle_aux_hidden_state_layer_ids": [1, 23, 44],
             "use_aux_hidden_state": True,
             "use_input_layernorm_in_first_layer": True,
             "use_last_layernorm": True,
             "use_mtp_layernorm": False
-        },
-        "rope_scaling": {
-            "factor": 16.0,
-            "high_freq_factor": 1.0,
-            "low_freq_factor": 1.0,
-            "original_max_position_embeddings": 8192,
-            "rope_type": "llama3"
         },
         "attention_bias": False,
         "model_type": "llama",
